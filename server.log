@@ -1,0 +1,500 @@
+
+> ai-fmea-builder@1.0.0 dev
+> next dev -p 3030
+
+  ▲ Next.js 14.2.31
+  - Local:        http://localhost:3030
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1764ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1709ms (1192 modules)
+ HEAD / 200 in 1973ms
+ ✓ Compiled in 259ms (602 modules)
+ GET / 200 in 26ms
+ GET /?email=admin%40fmea.local&password=admin123 200 in 55ms
+ ✓ Compiled /api/auth/validate in 335ms (702 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/auth/validate 200 in 432ms
+ ✓ Compiled /api/projects in 75ms (704 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects 200 in 108ms
+ GET /api/projects 200 in 4ms
+ ✓ Compiled /api/projects/[id]/failure-modes in 134ms (706 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/7acda3ad-26ac-4f5d-8371-af9c63beb427/failure-modes 200 in 444ms
+ GET /api/projects/7acda3ad-26ac-4f5d-8371-af9c63beb427/failure-modes 200 in 9ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ✓ Compiled in 439ms (1308 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/7acda3ad-26ac-4f5d-8371-af9c63beb427/failure-modes 200 in 34ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ✓ Compiled in 679ms (1308 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/7acda3ad-26ac-4f5d-8371-af9c63beb427/failure-modes 200 in 55ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/7acda3ad-26ac-4f5d-8371-af9c63beb427/failure-modes 200 in 20ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/7acda3ad-26ac-4f5d-8371-af9c63beb427/failure-modes 200 in 19ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ✓ Compiled /_not-found in 387ms (1293 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 501ms
+ GET /?email=admin%40fmea.local&password=admin123 200 in 191ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 25ms
+ ✓ Compiled /api/auth/validate in 147ms (703 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/auth/validate 200 in 209ms
+ ✓ Compiled /api/projects in 69ms (705 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects 200 in 93ms
+ GET /api/projects 200 in 4ms
+ ✓ Compiled in 378ms (1192 modules)
+ ✓ Compiled in 200ms (1192 modules)
+ ✓ Compiled in 171ms (1192 modules)
+ ✓ Compiled in 509ms (1192 modules)
+ ✓ Compiled in 175ms (1192 modules)
+ ✓ Compiled in 176ms (1192 modules)
+ ✓ Compiled in 243ms (1192 modules)
+ ✓ Compiled in 304ms (1192 modules)
+ ✓ Compiled in 266ms (1192 modules)
+ ✓ Compiled in 191ms (1192 modules)
+ ✓ Compiled in 215ms (1192 modules)
+ ✓ Compiled in 327ms (1178 modules)
+ ✓ Compiled /api/auth/validate in 185ms (702 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/auth/validate 200 in 258ms
+ ✓ Compiled /api/projects in 49ms (704 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects 200 in 74ms
+ GET /api/projects 200 in 4ms
+ ✓ Compiled in 118ms (1292 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/auth/validate 200 in 20ms
+ GET /api/projects 200 in 4ms
+ GET /api/projects 200 in 2ms
+ ✓ Compiled in 207ms (1292 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/auth/validate 200 in 42ms
+ GET /api/projects 200 in 7ms
+ GET /api/projects 200 in 4ms
+ ✓ Compiled in 165ms (602 modules)
+ ✓ Compiled in 148ms (602 modules)
+ ✓ Compiled in 189ms (602 modules)
+ ✓ Compiled in 421ms (1192 modules)
+ ✓ Compiled in 326ms (1192 modules)
+ ✓ Compiled in 225ms (1192 modules)
+ ✓ Compiled in 154ms (1192 modules)
+ ✓ Compiled in 289ms (1192 modules)
+ ✓ Compiled in 219ms (1192 modules)
+ ✓ Compiled in 222ms (1192 modules)
+ ✓ Compiled in 366ms (1206 modules)
+ ✓ Compiled in 233ms (1206 modules)
+ ✓ Compiled in 217ms (1206 modules)
+ ✓ Compiled in 294ms (1206 modules)
+ ✓ Compiled in 375ms (1206 modules)
+ GET / 200 in 161ms
+ GET /?email=admin%40fmea.local&password=admin123 200 in 41ms
+ ✓ Compiled /_not-found in 481ms (1195 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 555ms
+ ✓ Compiled /api/auth/validate in 165ms (710 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/auth/validate 200 in 245ms
+ ✓ Compiled /api/projects in 48ms (712 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects 200 in 73ms
+ GET /api/projects 200 in 3ms
+ ✓ Compiled /api/projects/[id]/failure-modes in 130ms (714 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/7acda3ad-26ac-4f5d-8371-af9c63beb427/failure-modes 200 in 163ms
+ GET /api/projects/7acda3ad-26ac-4f5d-8371-af9c63beb427/failure-modes 200 in 5ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /?email=admin%40fmea.local&password=admin123 200 in 177ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 16ms
+ GET /api/auth/validate 200 in 9ms
+ GET /api/projects 200 in 10ms
+ GET /api/projects 200 in 6ms
+ GET /api/projects/7acda3ad-26ac-4f5d-8371-af9c63beb427/failure-modes 200 in 15ms
+ GET /api/projects/7acda3ad-26ac-4f5d-8371-af9c63beb427/failure-modes 200 in 8ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ✓ Compiled /api/auth/logout in 185ms (716 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ POST /api/auth/logout 200 in 235ms
+ ✓ Compiled /api/auth/login in 128ms (718 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ POST /api/auth/login 200 in 409ms
+ GET /api/projects 200 in 6ms
+ GET /api/projects 200 in 3ms
+ GET /api/projects/7acda3ad-26ac-4f5d-8371-af9c63beb427/failure-modes 200 in 7ms
+ GET /api/projects/7acda3ad-26ac-4f5d-8371-af9c63beb427/failure-modes 200 in 3ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ POST /api/auth/logout 200 in 25ms
+ ✓ Compiled /api/auth/register in 163ms (711 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ POST /api/auth/register 201 in 442ms
+ ✓ Compiled /api/auth/login in 44ms (713 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ POST /api/auth/login 200 in 300ms
+ ✓ Compiled /api/projects in 63ms (715 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects 200 in 95ms
+ GET /api/projects 200 in 5ms
+ ✓ Compiled /api/projects/[id]/failure-modes in 68ms (717 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/7acda3ad-26ac-4f5d-8371-af9c63beb427/failure-modes 404 in 85ms
+ GET /api/projects/7acda3ad-26ac-4f5d-8371-af9c63beb427/failure-modes 404 in 3ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/7acda3ad-26ac-4f5d-8371-af9c63beb427/failure-modes 404 in 18ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /?email=admin%40fmea.local&password=admin123 200 in 158ms
+ ✓ Compiled /api/auth/validate in 131ms (719 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/auth/validate 200 in 165ms
+ GET /api/projects 200 in 5ms
+ GET /api/projects 200 in 3ms
+ GET / 200 in 63ms
+ ✓ Compiled /_not-found in 291ms (1195 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 403ms
+ ✓ Compiled in 368ms (1209 modules)
+ ✓ Compiled in 482ms (1206 modules)
+ ✓ Compiled in 256ms (1206 modules)
+ ✓ Compiled in 185ms (1206 modules)
+ ✓ Compiled in 173ms (1206 modules)
+ ✓ Compiled /api/projects in 159ms (709 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ POST /api/projects 201 in 239ms
+ GET /api/projects 200 in 7ms
+ ✓ Compiled /api/projects/[id]/failure-modes in 125ms (711 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 177ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 25ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ✓ Compiled in 221ms (1320 modules)
+ ✓ Compiled in 453ms (1320 modules)
+ HEAD / 200 in 159ms
+ ✓ Compiled /api/ai/suggest in 210ms (780 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+(node:65293) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Claude API Error: NotFoundError: 404 {"type":"error","error":{"type":"not_found_error","message":"model: claude-3-sonnet-20240229"}}
+    at APIError.generate (webpack-internal:///(rsc)/./node_modules/@anthropic-ai/sdk/error.mjs:62:20)
+    at Anthropic.makeStatusError (webpack-internal:///(rsc)/./node_modules/@anthropic-ai/sdk/core.mjs:304:65)
+    at Anthropic.makeRequest (webpack-internal:///(rsc)/./node_modules/@anthropic-ai/sdk/core.mjs:347:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async AIService.callClaude (webpack-internal:///(rsc)/./lib/ai.ts:20:30)
+    at async AIService.suggestCauses (webpack-internal:///(rsc)/./lib/ai.ts:121:30)
+    at async eval (webpack-internal:///(rsc)/./app/api/ai/suggest/route.ts:30:34)
+    at async /Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57228
+    at async eT.execute (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46851)
+    at async eT.handle (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:58760)
+    at async doRender (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:1366:42)
+    at async cacheEntry.responseCache.get.routeKind (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:1588:28)
+    at async DevServer.renderToResponseWithComponentsImpl (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:1496:28)
+    at async DevServer.renderPageComponent (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:1924:24)
+    at async DevServer.renderToResponseImpl (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:818:17)
+    at async /Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/start-server.js:141:13) {
+  status: 404,
+  headers: {
+    'anthropic-organization-id': 'e73ca283-1aca-40e2-a49c-dc650d52da23',
+    'cf-cache-status': 'DYNAMIC',
+    'cf-ray': '9698fa5f884dfdcd-JNB',
+    connection: 'keep-alive',
+    'content-encoding': 'gzip',
+    'content-type': 'application/json',
+    date: 'Sun, 03 Aug 2025 21:41:15 GMT',
+    'request-id': 'req_011CRmW97x1ts24dfC2hxqLg',
+    server: 'cloudflare',
+    'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+    'transfer-encoding': 'chunked',
+    via: '1.1 google',
+    'x-robots-tag': 'none',
+    'x-should-retry': 'false'
+  },
+  error: {
+    type: 'error',
+    error: {
+      type: 'not_found_error',
+      message: 'model: claude-3-sonnet-20240229'
+    }
+  }
+}
+ POST /api/ai/suggest 200 in 1349ms
+ POST /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 201 in 31ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 4ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 12ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 13ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 16ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 12ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ✓ Compiled /_not-found in 401ms (1307 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 481ms
+ ✓ Compiled in 491ms (1206 modules)
+ ✓ Compiled in 256ms (1206 modules)
+ ✓ Compiled /api/projects/[id]/failure-modes in 53ms (709 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 155ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 3ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ✓ Compiled in 358ms (1324 modules)
+ ✓ Compiled in 271ms (1324 modules)
+ HEAD / 200 in 148ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 45ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 8ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ✓ Compiled in 326ms (1324 modules)
+ ✓ Compiled in 204ms (1324 modules)
+ GET / 200 in 157ms
+ ✓ Compiled in 334ms (1212 modules)
+ ✓ Compiled in 227ms (1212 modules)
+ ✓ Compiled in 175ms (1212 modules)
+ ✓ Compiled in 131ms (1212 modules)
+ ✓ Compiled in 180ms (1212 modules)
+ ✓ Compiled in 125ms (1212 modules)
+ ✓ Compiled in 173ms (1212 modules)
+ ✓ Compiled in 119ms (1212 modules)
+ HEAD / 200 in 139ms
+ GET /?email=admin%40fmea.local&password=admin123 200 in 35ms
+ ✓ Compiled /api/auth/validate in 218ms (712 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/auth/validate 200 in 295ms
+ ✓ Compiled /api/projects in 58ms (714 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects 200 in 95ms
+ GET /api/projects 200 in 21ms
+ ✓ Compiled /api/projects/[id]/failure-modes in 93ms (716 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 116ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 3ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ✓ Compiled in 614ms (1212 modules)
+ ✓ Compiled in 273ms (1212 modules)
+ ✓ Compiled in 145ms (1212 modules)
+ ✓ Compiled in 148ms (1212 modules)
+ ✓ Compiled in 184ms (1212 modules)
+ GET / 200 in 158ms
+ ✓ Compiled in 250ms (1212 modules)
+ ✓ Compiled in 221ms (1212 modules)
+ HEAD / 200 in 121ms
+ ✓ Compiled in 318ms (1212 modules)
+ ✓ Compiled in 192ms (1212 modules)
+ HEAD / 200 in 162ms
+ HEAD / 200 in 26ms
+ ✓ Compiled in 303ms (1212 modules)
+ ✓ Compiled in 255ms (1212 modules)
+ ✓ Compiled in 195ms (1212 modules)
+ ✓ Compiled in 334ms (1212 modules)
+ ✓ Compiled in 189ms (1212 modules)
+ ✓ Compiled in 192ms (1212 modules)
+ ✓ Compiled in 127ms (1212 modules)
+ ✓ Compiled in 200ms (1212 modules)
+ ✓ Compiled in 139ms (1212 modules)
+ ✓ Compiled in 196ms (1212 modules)
+ ✓ Compiled in 64ms (612 modules)
+ ✓ Compiled in 101ms (1198 modules)
+ ✓ Compiled in 113ms (612 modules)
+ ✓ Compiled in 193ms (612 modules)
+ ✓ Compiled in 76ms (612 modules)
+ ✓ Compiled in 419ms (1212 modules)
+ ✓ Compiled in 239ms (1212 modules)
+ ✓ Compiled /api/projects/[id]/failure-modes in 193ms (712 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 285ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ✓ Compiled in 156ms (612 modules)
+ ✓ Compiled in 125ms (612 modules)
+ ✓ Compiled in 69ms (612 modules)
+ ✓ Compiled in 67ms (612 modules)
+ ✓ Compiled in 65ms (612 modules)
+ ✓ Compiled in 137ms (612 modules)
+ ✓ Compiled in 73ms (612 modules)
+ ✓ Compiled in 391ms (1212 modules)
+ ✓ Compiled in 185ms (1212 modules)
+ ✓ Compiled in 187ms (1212 modules)
+ ✓ Compiled /api/projects/[id]/failure-modes in 38ms (712 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 101ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 4ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ✓ Compiled in 420ms (1324 modules)
+ ✓ Compiled in 1877ms (2404 modules)
+ ⚠ ./app/api/projects/[id]/metrics/route.ts
+Attempted import error: 'loadDatabase' is not exported from '@/lib/database' (imported as 'loadDatabase').
+
+Import trace for requested module:
+./app/api/projects/[id]/metrics/route.ts
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ○ Compiling /api/projects/[id]/metrics ...
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+Error fetching project metrics: TypeError: (0 , _lib_database__WEBPACK_IMPORTED_MODULE_1__.loadDatabase) is not a function
+    at GET (webpack-internal:///(rsc)/./app/api/projects/[id]/metrics/route.ts:12:79)
+    at /Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57234
+    at /Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:7062)
+    at ContextAPI.with (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:518)
+    at NoopTracer.startActiveSpan (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18093)
+    at ProxyTracer.startActiveSpan (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18854)
+    at /Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/trace/tracer.js:122:103
+    at NoopContextManager.with (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:7062)
+    at ContextAPI.with (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:518)
+    at NextTracerImpl.trace (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/trace/tracer.js:122:28)
+    at /Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:48896
+    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+    at Object.wrap (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:40958)
+    at /Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:47472
+    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+    at Object.wrap (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:38293)
+    at /Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:47434
+    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+    at eT.execute (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46881)
+    at eT.handle (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:58771)
+    at doRender (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:1366:60)
+    at cacheEntry.responseCache.get.routeKind (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:1576:46)
+    at ResponseCache.get (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/response-cache/index.js:49:26)
+    at DevServer.renderToResponseWithComponentsImpl (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:1496:53)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async DevServer.renderPageComponent (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:1924:24)
+    at async DevServer.renderToResponseImpl (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:818:17)
+    at async /Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/start-server.js:141:13)
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 500 in 669ms
+Error fetching project metrics: TypeError: (0 , _lib_database__WEBPACK_IMPORTED_MODULE_1__.loadDatabase) is not a function
+    at GET (webpack-internal:///(rsc)/./app/api/projects/[id]/metrics/route.ts:12:79)
+    at /Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:57234
+    at /Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:7062)
+    at ContextAPI.with (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:518)
+    at NoopTracer.startActiveSpan (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18093)
+    at ProxyTracer.startActiveSpan (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18854)
+    at /Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/trace/tracer.js:122:103
+    at NoopContextManager.with (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:7062)
+    at ContextAPI.with (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:518)
+    at NextTracerImpl.trace (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/trace/tracer.js:122:28)
+    at /Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:48896
+    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+    at Object.wrap (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:40958)
+    at /Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:47472
+    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+    at Object.wrap (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:38293)
+    at /Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:47434
+    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+    at eT.execute (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:46881)
+    at eT.handle (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:6:58771)
+    at doRender (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:1366:60)
+    at cacheEntry.responseCache.get.routeKind (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:1576:46)
+    at ResponseCache.get (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/response-cache/index.js:49:26)
+    at DevServer.renderToResponseWithComponentsImpl (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:1496:53)
+    at async DevServer.renderPageComponent (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:1924:24)
+    at async DevServer.renderToResponseImpl (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:1962:32)
+    at async DevServer.pipeImpl (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/base-server.js:818:17)
+    at async /Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/Users/macbook/Downloads/nextmint-app/node_modules/next/dist/server/lib/start-server.js:141:13)
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 500 in 10ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ✓ Compiled /api/projects/[id]/metrics in 434ms (2406 modules)
+ ✓ Compiled in 218ms (2406 modules)
+ ✓ Compiled in 98ms (1152 modules)
+ ✓ Compiled in 91ms (1152 modules)
+ ✓ Compiled in 94ms (1152 modules)
+ ✓ Compiled in 127ms (1152 modules)
+ ✓ Compiled in 174ms (1152 modules)
+ ✓ Compiled in 147ms (1152 modules)
+ GET /?email=admin%40fmea.local&password=admin123 200 in 247ms
+ ✓ Compiled /api/auth/validate in 185ms (1252 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/auth/validate 200 in 240ms
+ ✓ Compiled /api/projects in 133ms (1254 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects 200 in 172ms
+ GET /api/projects 200 in 4ms
+ ✓ Compiled /api/projects/[id]/failure-modes in 77ms (1256 modules)
+ ✓ Compiled (1258 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 163ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 169ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 9ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 29ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 16ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 4ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 8ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 5ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 3ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ✓ Compiled in 223ms (1152 modules)
+ ✓ Compiled in 712ms (2292 modules)
+ ✓ Compiled in 304ms (2292 modules)
+ ✓ Compiled in 253ms (2292 modules)
+ ✓ Compiled /api/projects/[id]/failure-modes in 86ms (1173 modules)
+ ✓ Compiled (1254 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 360ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 366ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 5ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 6ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 2ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 3ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ✓ Compiled in 226ms (2406 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 10ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 25ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 18ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/failure-modes 200 in 7ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 5ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 3ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 3ms
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 3ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ✓ Compiled in 293ms (2406 modules)
+ ✓ Compiled in 1697ms (2781 modules)
+ ✓ Compiled in 339ms (2653 modules)
+ ✓ Compiled /api/projects/[id]/metrics in 76ms (1359 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 142ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ✓ Compiled in 540ms (2700 modules)
+ ✓ Compiled in 329ms (2700 modules)
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ GET /api/projects/b4fcba56-ec58-41f4-882c-7a0758a1f24c/metrics 200 in 29ms
+Simple JSON database initialized at: /Users/macbook/Downloads/nextmint-app/data/fmea-data.json
+ ✓ Compiled in 317ms (2700 modules)
+ ✓ Compiled in 507ms (2700 modules)
+ ✓ Compiled in 536ms (2700 modules)
+ ✓ Compiled in 186ms (1341 modules)
+ ✓ Compiled in 229ms (1341 modules)
+ ✓ Compiled in 139ms (1341 modules)
