@@ -58,17 +58,17 @@ export default function ComponentRow({
 
   return (
     <div
-      className={`bg-white rounded-xl border-2 transition-all duration-300 ease-out mb-3 overflow-hidden ${
+      className={`bg-white rounded-lg border transition-all duration-200 mb-2 overflow-hidden ${
         isSelected
-          ? 'border-blue-500 shadow-2xl ring-4 ring-blue-100 scale-[1.01]'
-          : 'border-gray-200 shadow-md hover:border-blue-300 hover:shadow-xl'
+          ? 'border-blue-500 shadow-md'
+          : 'border-gray-300 shadow-sm hover:border-gray-400'
       }`}
     >
       {/* Component Header */}
       <div
-        className={`px-6 py-4 cursor-pointer select-none transition-all duration-300 ${
-          isExpanded ? 'bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50' : 'bg-white hover:bg-gray-50'
-        } rounded-t-xl`}
+        className={`px-6 py-3 cursor-pointer select-none transition-colors duration-200 ${
+          isExpanded ? 'bg-gray-50' : 'bg-white hover:bg-gray-50'
+        }`}
         onClick={() => {
           onToggle();
           onSelect();
@@ -78,37 +78,37 @@ export default function ComponentRow({
           <div className="flex items-center space-x-4 flex-1">
             {/* Expand/Collapse Button */}
             <button
-              className="text-gray-600 hover:text-blue-600 transition-all duration-200 p-1.5 rounded-lg hover:bg-blue-100 active:scale-95"
+              className="text-gray-600 hover:text-gray-900 transition-colors p-1 rounded hover:bg-gray-100"
               onClick={(e) => {
                 e.stopPropagation();
                 onToggle();
               }}
             >
               {isExpanded ? (
-                <ChevronDown className="w-5 h-5 transition-transform duration-200" />
+                <ChevronDown className="w-5 h-5" />
               ) : (
-                <ChevronRight className="w-5 h-5 transition-transform duration-200" />
+                <ChevronRight className="w-5 h-5" />
               )}
             </button>
 
             {/* Component Info */}
             <div className="flex-1 flex items-center space-x-4 flex-wrap">
-              <h3 className="text-lg font-bold text-gray-900">
-                <span className="text-blue-600">▶</span> COMPONENT: {component.name}
+              <h3 className="text-base font-semibold text-gray-900">
+                COMPONENT: {component.name}
               </h3>
 
               {component.function && (
-                <span className="text-sm text-gray-700 font-medium">
-                  | Function: <span className="text-blue-600">{component.function}</span>
+                <span className="text-sm text-gray-600">
+                  | Function: <span className="text-gray-900">{component.function}</span>
                 </span>
               )}
 
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800 border border-blue-200">
-                {failureModesCount} Failure Mode{failureModesCount !== 1 ? 's' : ''}
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 border border-gray-300">
+                {failureModesCount} FM{failureModesCount !== 1 ? 's' : ''}
               </span>
 
               <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium text-gray-600">Highest RPN:</span>
+                <span className="text-sm text-gray-600">Highest RPN:</span>
                 <RPNBadge rpn={highestRPN} showLabel={false} size="sm" />
               </div>
             </div>
@@ -120,9 +120,9 @@ export default function ComponentRow({
                 onSelect();
                 onAddFailureMode();
               }}
-              className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg text-sm font-semibold transform hover:scale-105 active:scale-95"
+              className="flex items-center space-x-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors text-sm"
             >
-              <Plus className="w-4 h-4 transition-transform group-hover:rotate-90 duration-200" />
+              <Plus className="w-4 h-4" />
               <span>Failure Mode</span>
             </button>
           </div>
@@ -131,27 +131,24 @@ export default function ComponentRow({
 
       {/* Expanded Content - Failure Modes */}
       {isExpanded && (
-        <div className="border-t-2 border-gray-200 bg-gradient-to-b from-gray-50 to-white animate-fadeIn">
+        <div className="border-t border-gray-200 bg-gray-50">
           {failureModesCount === 0 ? (
-            <div className="px-6 py-12 text-center animate-slideUp">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
-                <Plus className="w-8 h-8 text-blue-600" />
-              </div>
-              <p className="text-gray-600 mb-6 text-sm font-medium">No failure modes in this component yet</p>
+            <div className="px-6 py-8 text-center">
+              <p className="text-gray-500 mb-3 text-sm">No failure modes in this component yet</p>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onSelect();
                   onAddFailureMode();
                 }}
-                className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg text-sm font-semibold transform hover:scale-105 active:scale-95"
+                className="inline-flex items-center space-x-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors text-sm"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add First Failure Mode</span>
               </button>
             </div>
           ) : (
-            <div className="p-4 space-y-3 animate-slideUp">
+            <div className="p-3 space-y-2">
               {children}
             </div>
           )}

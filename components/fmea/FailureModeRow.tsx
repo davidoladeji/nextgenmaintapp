@@ -80,17 +80,17 @@ export default function FailureModeRow({
 
   return (
     <div
-      className={`bg-white rounded-lg border transition-all duration-200 ${
+      className={`bg-white rounded-md border transition-all duration-200 ${
         isSelected
-          ? 'border-orange-500 shadow-md ring-2 ring-orange-200'
-          : 'border-gray-300 hover:border-gray-400 hover:shadow-sm'
+          ? 'border-orange-500 shadow-sm'
+          : 'border-gray-300 hover:border-gray-400'
       }`}
     >
       {/* Failure Mode Header */}
       <div
-        className={`px-5 py-3 cursor-pointer select-none ${
-          isExpanded ? 'bg-gradient-to-r from-orange-50 to-amber-50' : 'bg-white'
-        } rounded-t-lg transition-colors duration-200`}
+        className={`px-4 py-2.5 cursor-pointer select-none transition-colors duration-200 ${
+          isExpanded ? 'bg-gray-50' : 'bg-white hover:bg-gray-50'
+        }`}
         onClick={() => {
           onToggle();
           onSelect();
@@ -100,7 +100,7 @@ export default function FailureModeRow({
           <div className="flex items-center space-x-3 flex-1">
             {/* Expand/Collapse Button */}
             <button
-              className="text-gray-500 hover:text-gray-700 transition-colors p-0.5 rounded hover:bg-gray-100"
+              className="text-gray-600 hover:text-gray-900 transition-colors p-0.5 rounded"
               onClick={(e) => {
                 e.stopPropagation();
                 onToggle();
@@ -113,32 +113,31 @@ export default function FailureModeRow({
               )}
             </button>
 
-            {/* Failure Mode Info */}
-            <div className="flex-1 grid grid-cols-12 gap-3 items-center">
-              {/* Name - 4 columns */}
+            {/* Failure Mode Info - Grid Layout */}
+            <div className="flex-1 grid grid-cols-12 gap-2 items-center text-sm">
+              {/* Failure Mode Name */}
               <div className="col-span-4">
-                <span className="text-sm font-semibold text-gray-900">
-                  <span className="text-orange-600 mr-1">▶</span>
-                  Failure Mode: <span className="text-orange-700">{failureMode.failure_mode}</span>
+                <span className="font-medium text-gray-900">
+                  Failure Mode: <span className="text-gray-700">{failureMode.failure_mode}</span>
                 </span>
               </div>
 
-              {/* RPN (Pre) - 2 columns */}
-              <div className="col-span-2 flex items-center space-x-2">
-                <span className="text-xs font-medium text-gray-600">RPN (Pre):</span>
+              {/* RPN Pre */}
+              <div className="col-span-2 flex items-center space-x-1">
+                <span className="text-xs text-gray-600">RPN (Pre):</span>
                 <RPNBadge rpn={rpnPre} showLabel={false} size="sm" />
               </div>
 
-              {/* # Effects - 1 column */}
-              <div className="col-span-1 text-center">
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800 border border-indigo-200">
+              {/* Effects Count */}
+              <div className="col-span-2">
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 border border-gray-300">
                   {effectsCount} Effect{effectsCount !== 1 ? 's' : ''}
                 </span>
               </div>
 
-              {/* RPN (Post) - 2 columns */}
-              <div className="col-span-2 flex items-center space-x-2">
-                <span className="text-xs font-medium text-gray-600">RPN (Post):</span>
+              {/* RPN Post */}
+              <div className="col-span-2 flex items-center space-x-1">
+                <span className="text-xs text-gray-600">RPN (Post):</span>
                 {rpnPost > 0 ? (
                   <RPNBadge rpn={rpnPost} showLabel={false} size="sm" />
                 ) : (
@@ -146,53 +145,48 @@ export default function FailureModeRow({
                 )}
               </div>
 
-              {/* Owner - 2 columns */}
+              {/* Owner */}
               <div className="col-span-2">
-                <span className="text-xs font-medium text-gray-600">Owner: </span>
-                <span className="text-xs text-gray-900">{owner}</span>
-              </div>
-
-              {/* Add Effect Button - 1 column */}
-              <div className="col-span-1 flex justify-end">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelect();
-                    onAddEffect();
-                  }}
-                  className="flex items-center space-x-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors text-xs font-medium shadow-sm hover:shadow"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Effect</span>
-                </button>
+                <span className="text-xs text-gray-600">Owner: <span className="text-gray-900">{owner}</span></span>
               </div>
             </div>
+
+            {/* Add Effect Button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelect();
+                onAddEffect();
+              }}
+              className="flex items-center space-x-1.5 px-2.5 py-1 bg-orange-600 hover:bg-orange-700 text-white rounded-md transition-colors text-xs"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Effect</span>
+            </button>
           </div>
         </div>
       </div>
 
       {/* Expanded Content - Effects Table */}
       {isExpanded && (
-        <div className="border-t border-gray-200 bg-white">
+        <div className="border-t border-gray-200">
           {effectsCount === 0 ? (
-            <div className="px-6 py-8 text-center">
-              <p className="text-gray-500 mb-3 text-sm">No effects added yet</p>
+            <div className="px-4 py-6 text-center">
+              <p className="text-gray-500 mb-2 text-xs">No effects added to this failure mode yet</p>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onSelect();
                   onAddEffect();
                 }}
-                className="inline-flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium"
+                className="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-orange-600 hover:bg-orange-700 text-white rounded-md transition-colors text-xs"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-3.5 h-3.5" />
                 <span>Add First Effect</span>
               </button>
             </div>
           ) : (
-            <div>
-              {children}
-            </div>
+            <div>{children}</div>
           )}
         </div>
       )}

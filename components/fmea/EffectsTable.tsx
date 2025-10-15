@@ -5,6 +5,7 @@ import { useState } from 'react';
 import RPNBadge from './RPNBadge';
 import { useAuth } from '@/lib/store';
 import toast from 'react-hot-toast';
+import { Save, X } from 'lucide-react';
 
 interface EffectsTableProps {
   failureMode: FailureMode;
@@ -38,7 +39,8 @@ export default function EffectsTable({ failureMode, onRefresh }: EffectsTablePro
   const [editingEffectId, setEditingEffectId] = useState<string | null>(null);
   const [editData, setEditData] = useState<Partial<Effect>>({});
 
-  const handleStartEdit = (effect: Effect) => {
+  const handleStartEdit = (effect: Effect, e: React.MouseEvent) => {
+    e.stopPropagation();
     setEditingEffectId(effect.id);
     setEditData({
       description: effect.description,
@@ -112,10 +114,10 @@ export default function EffectsTable({ failureMode, onRefresh }: EffectsTablePro
   const firstAction = failureMode.actions?.[0];
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm border-collapse">
+    <div className="overflow-x-auto w-full">
+      <table className="w-full text-sm border-collapse min-w-[2000px]">
         <thead className="sticky top-0 z-10">
-          <tr className="bg-gradient-to-r from-gray-700 to-gray-800 text-white">
+          <tr className="bg-gray-700 text-white">
             <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wide border-r border-gray-600 min-w-[200px]">
               Effects
             </th>
@@ -137,7 +139,7 @@ export default function EffectsTable({ failureMode, onRefresh }: EffectsTablePro
             <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wide border-r border-gray-600 min-w-[150px]">
               Justification (Pre)
             </th>
-            <th className="px-2 py-3 text-center text-xs font-bold uppercase tracking-wide border-r-2 border-orange-400 w-24 bg-orange-800">
+            <th className="px-2 py-3 text-center text-xs font-bold uppercase tracking-wide border-r-2 border-orange-400 w-24 bg-orange-700">
               RPN (Pre)
             </th>
             <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wide border-r border-gray-600 min-w-[200px]">
@@ -161,7 +163,7 @@ export default function EffectsTable({ failureMode, onRefresh }: EffectsTablePro
             <th className="px-2 py-3 text-center text-xs font-bold uppercase tracking-wide border-r border-gray-600 w-16">
               DET (Post)
             </th>
-            <th className="px-2 py-3 text-center text-xs font-bold uppercase tracking-wide w-24 bg-green-800">
+            <th className="px-2 py-3 text-center text-xs font-bold uppercase tracking-wide w-32 bg-green-700">
               RPN (Post)
             </th>
           </tr>
@@ -174,152 +176,185 @@ export default function EffectsTable({ failureMode, onRefresh }: EffectsTablePro
               const rpnPost = calculateRPNPost(effect);
 
               if (isEditing) {
-                // Edit Mode - Inline form
+                // Edit Mode - Keep table structure with inputs in each cell
                 return (
-                  <tr key={effect.id} className="border-b-2 border-blue-500 bg-blue-50">
-                    <td colSpan={16} className="px-4 py-4">
-                      <div className="grid grid-cols-4 gap-4">
-                        {/* Row 1: Effect Description & SEV */}
-                        <div className="col-span-3">
-                          <label className="block text-xs font-semibold text-gray-700 mb-1">Effect Description</label>
-                          <textarea
-                            value={editData.description || ''}
-                            onChange={(e) => setEditData({ ...editData, description: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                            rows={2}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold text-gray-700 mb-1">SEV (1-10)</label>
-                          <input
-                            type="number"
-                            min="1"
-                            max="10"
-                            value={editData.severity || 1}
-                            onChange={(e) => setEditData({ ...editData, severity: parseInt(e.target.value) || 1 })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                          />
-                        </div>
+                  <tr key={effect.id} className="border-b-2 border-blue-400 bg-gray-50">
+                    {/* 1. Effects */}
+                    <td className="px-2 py-2 border-r border-gray-200">
+                      <textarea
+                        value={editData.description || ''}
+                        onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        rows={2}
+                        placeholder="Effect description"
+                      />
+                    </td>
 
-                        {/* Row 2: Potential Cause, Current Design, Justification Pre */}
-                        <div>
-                          <label className="block text-xs font-semibold text-gray-700 mb-1">Potential Cause</label>
-                          <input
-                            type="text"
-                            value={editData.potential_cause || ''}
-                            onChange={(e) => setEditData({ ...editData, potential_cause: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                            placeholder="Link to cause"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold text-gray-700 mb-1">Current Design</label>
-                          <input
-                            type="text"
-                            value={editData.current_design || ''}
-                            onChange={(e) => setEditData({ ...editData, current_design: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                          />
-                        </div>
-                        <div className="col-span-2">
-                          <label className="block text-xs font-semibold text-gray-700 mb-1">Justification (Pre)</label>
-                          <input
-                            type="text"
-                            value={editData.justification_pre || ''}
-                            onChange={(e) => setEditData({ ...editData, justification_pre: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                          />
-                        </div>
+                    {/* 2. SEV */}
+                    <td className="px-2 py-2 border-r border-gray-200">
+                      <input
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={editData.severity || 1}
+                        onChange={(e) => setEditData({ ...editData, severity: parseInt(e.target.value) || 1 })}
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                    </td>
 
-                        {/* Row 3: Post-mitigation fields */}
-                        <div>
-                          <label className="block text-xs font-semibold text-gray-700 mb-1">Justification (Post)</label>
-                          <input
-                            type="text"
-                            value={editData.justification_post || ''}
-                            onChange={(e) => setEditData({ ...editData, justification_post: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold text-gray-700 mb-1">Responsible</label>
-                          <input
-                            type="text"
-                            value={editData.responsible || ''}
-                            onChange={(e) => setEditData({ ...editData, responsible: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold text-gray-700 mb-1">Action Taken</label>
-                          <input
-                            type="text"
-                            value={editData.action_taken || ''}
-                            onChange={(e) => setEditData({ ...editData, action_taken: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold text-gray-700 mb-1">Completion Date</label>
-                          <input
-                            type="date"
-                            value={editData.completion_date || ''}
-                            onChange={(e) => setEditData({ ...editData, completion_date: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                          />
-                        </div>
+                    {/* 3. Potential Cause */}
+                    <td className="px-2 py-2 border-r border-gray-200">
+                      <input
+                        type="text"
+                        value={editData.potential_cause || ''}
+                        onChange={(e) => setEditData({ ...editData, potential_cause: e.target.value })}
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder="Cause"
+                      />
+                    </td>
 
-                        {/* Row 4: Post ratings */}
-                        <div>
-                          <label className="block text-xs font-semibold text-gray-700 mb-1">SEV (Post)</label>
-                          <input
-                            type="number"
-                            min="1"
-                            max="10"
-                            value={editData.severity_post || ''}
-                            onChange={(e) => setEditData({ ...editData, severity_post: parseInt(e.target.value) || undefined })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                            placeholder="1-10"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold text-gray-700 mb-1">OCC (Post)</label>
-                          <input
-                            type="number"
-                            min="1"
-                            max="10"
-                            value={editData.occurrence_post || ''}
-                            onChange={(e) => setEditData({ ...editData, occurrence_post: parseInt(e.target.value) || undefined })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                            placeholder="1-10"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold text-gray-700 mb-1">DET (Post)</label>
-                          <input
-                            type="number"
-                            min="1"
-                            max="10"
-                            value={editData.detection_post || ''}
-                            onChange={(e) => setEditData({ ...editData, detection_post: parseInt(e.target.value) || undefined })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                            placeholder="1-10"
-                          />
-                        </div>
+                    {/* 4. OCC (read-only from cause) */}
+                    <td className="px-2 py-2 text-center text-gray-500 border-r border-gray-200 text-xs">
+                      {firstCause?.occurrence || '-'}
+                    </td>
 
-                        {/* Action Buttons */}
-                        <div className="col-span-4 flex justify-end space-x-3 pt-2">
+                    {/* 5. Current Design */}
+                    <td className="px-2 py-2 border-r border-gray-200">
+                      <input
+                        type="text"
+                        value={editData.current_design || ''}
+                        onChange={(e) => setEditData({ ...editData, current_design: e.target.value })}
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder="Control"
+                      />
+                    </td>
+
+                    {/* 6. DET (read-only from control) */}
+                    <td className="px-2 py-2 text-center text-gray-500 border-r border-gray-200 text-xs">
+                      {firstControl?.detection || 10}
+                    </td>
+
+                    {/* 7. Justification (Pre) */}
+                    <td className="px-2 py-2 border-r border-gray-200">
+                      <input
+                        type="text"
+                        value={editData.justification_pre || ''}
+                        onChange={(e) => setEditData({ ...editData, justification_pre: e.target.value })}
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder="Justification"
+                      />
+                    </td>
+
+                    {/* 8. RPN (Pre) - calculated */}
+                    <td className="px-2 py-2 text-center bg-orange-50 border-r-2 border-orange-200">
+                      <RPNBadge rpn={calculateRPNPre(effect, firstCause)} showLabel={false} size="sm" />
+                    </td>
+
+                    {/* 9. Recommended Actions (read-only from actions) */}
+                    <td className="px-2 py-2 text-gray-500 text-xs border-r border-gray-200">
+                      {firstAction?.description || '-'}
+                    </td>
+
+                    {/* 10. Justification (Post) */}
+                    <td className="px-2 py-2 border-r border-gray-200">
+                      <input
+                        type="text"
+                        value={editData.justification_post || ''}
+                        onChange={(e) => setEditData({ ...editData, justification_post: e.target.value })}
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder="Justification"
+                      />
+                    </td>
+
+                    {/* 11. Responsible */}
+                    <td className="px-2 py-2 border-r border-gray-200">
+                      <input
+                        type="text"
+                        value={editData.responsible || ''}
+                        onChange={(e) => setEditData({ ...editData, responsible: e.target.value })}
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder="Owner"
+                      />
+                    </td>
+
+                    {/* 12. Action Taken & Date */}
+                    <td className="px-2 py-2 border-r border-gray-200">
+                      <input
+                        type="text"
+                        value={editData.action_taken || ''}
+                        onChange={(e) => setEditData({ ...editData, action_taken: e.target.value })}
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs mb-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder="Action"
+                      />
+                      <input
+                        type="date"
+                        value={editData.completion_date || ''}
+                        onChange={(e) => setEditData({ ...editData, completion_date: e.target.value })}
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                    </td>
+
+                    {/* 13. SEV (Post) */}
+                    <td className="px-2 py-2 border-r border-gray-200">
+                      <input
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={editData.severity_post || ''}
+                        onChange={(e) => setEditData({ ...editData, severity_post: parseInt(e.target.value) || undefined })}
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder="1-10"
+                      />
+                    </td>
+
+                    {/* 14. OCC (Post) */}
+                    <td className="px-2 py-2 border-r border-gray-200">
+                      <input
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={editData.occurrence_post || ''}
+                        onChange={(e) => setEditData({ ...editData, occurrence_post: parseInt(e.target.value) || undefined })}
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder="1-10"
+                      />
+                    </td>
+
+                    {/* 15. DET (Post) */}
+                    <td className="px-2 py-2 border-r border-gray-200">
+                      <input
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={editData.detection_post || ''}
+                        onChange={(e) => setEditData({ ...editData, detection_post: parseInt(e.target.value) || undefined })}
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-xs text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder="1-10"
+                      />
+                    </td>
+
+                    {/* 16. RPN (Post) with action buttons */}
+                    <td className="px-2 py-2 text-center bg-green-50">
+                      <div className="flex flex-col items-center space-y-1">
+                        {calculateRPNPost(effect) > 0 ? (
+                          <RPNBadge rpn={calculateRPNPost(effect)} showLabel={false} size="sm" />
+                        ) : (
+                          <span className="text-gray-400 text-xs">-</span>
+                        )}
+                        <div className="flex space-x-1">
                           <button
                             onClick={() => handleSaveEdit(effect.id)}
-                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+                            className="p-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs"
+                            title="Save"
                           >
-                            Save Changes
+                            <Save className="w-3 h-3" />
                           </button>
                           <button
                             onClick={handleCancelEdit}
-                            className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+                            className="p-1.5 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded text-xs"
+                            title="Cancel"
                           >
-                            Cancel
+                            <X className="w-3 h-3" />
                           </button>
                         </div>
                       </div>
@@ -332,8 +367,8 @@ export default function EffectsTable({ failureMode, onRefresh }: EffectsTablePro
               return (
                 <tr
                   key={effect.id}
-                  onClick={() => handleStartEdit(effect)}
-                  className="border-b border-gray-200 hover:bg-blue-50 cursor-pointer transition-colors"
+                  onDoubleClick={(e) => handleStartEdit(effect, e)}
+                  className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors"
                 >
                   {/* 1. Effects */}
                   <td className="px-3 py-3 text-gray-900 border-r border-gray-200">{effect.description}</td>
@@ -422,8 +457,8 @@ export default function EffectsTable({ failureMode, onRefresh }: EffectsTablePro
             })
           ) : (
             <tr>
-              <td colSpan={16} className="px-4 py-12 text-center text-gray-500 italic">
-                No effects added yet. Click the row above to add an effect to this failure mode.
+              <td colSpan={16} className="px-4 py-12 text-center text-gray-500 italic text-sm">
+                No effects added yet. Double-click a row to edit.
               </td>
             </tr>
           )}
