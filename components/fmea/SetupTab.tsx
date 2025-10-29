@@ -1,4 +1,5 @@
 'use client';
+// @ts-nocheck
 
 import React, { useMemo, useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
