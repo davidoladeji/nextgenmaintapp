@@ -45,8 +45,9 @@ export interface Effect {
   justification_pre?: string; // Justification for pre-mitigation ratings
   justification_post?: string; // Justification for post-mitigation ratings
   responsible?: string; // Person responsible for actions
-  action_taken?: string; // Description of action taken
-  completion_date?: string; // Date when action was completed
+  action_status?: string; // Action status: Not Started, In Progress, Done
+  action_taken?: string; // Description of action taken (deprecated)
+  completion_date?: string; // Date when action was completed (deprecated)
   severity_post?: number; // Post-mitigation severity (1-10)
   occurrence_post?: number; // Post-mitigation occurrence (1-10)
   detection_post?: number; // Post-mitigation detection (1-10)
@@ -364,4 +365,102 @@ export interface Tool {
   is_active: boolean;
   coming_soon: boolean;
   created_at: string;
+}
+
+// Platform Settings Types
+export interface PlanConfig {
+  maxUsers: number;
+  maxProjects: number;
+  maxStorageGB: number;
+  featuresEnabled: string[];
+  price: number;
+  aiRequestsPerMonth: number;
+}
+
+export interface PlatformSettings {
+  // Branding & Theme
+  branding: {
+    accentColor: string;
+    accentColorDark: string;
+    accentColorHover: string;
+    accentColorDarkHover: string;
+    logoUrl?: string;
+    faviconUrl?: string;
+    platformName: string;
+    companyName: string;
+  };
+
+  // Feature Flags
+  features: {
+    aiAssistant: boolean;
+    multiOrganization: boolean;
+    guestLinks: boolean;
+    dataExport: boolean;
+    apiAccess: boolean;
+    customBranding: boolean;
+    advancedAnalytics: boolean;
+    auditLogs: boolean;
+  };
+
+  // Plan Limits
+  planLimits: {
+    free: PlanConfig;
+    starter: PlanConfig;
+    professional: PlanConfig;
+    enterprise: PlanConfig;
+  };
+
+  // Email & Notifications
+  email: {
+    fromName: string;
+    fromEmail: string;
+    smtpHost?: string;
+    smtpPort?: number;
+    enableNotifications: boolean;
+    notificationTypes: {
+      invitations: boolean;
+      actionReminders: boolean;
+      weeklyDigest: boolean;
+      securityAlerts: boolean;
+    };
+  };
+
+  // Security & Authentication
+  security: {
+    sessionTimeout: number;
+    passwordMinLength: number;
+    requireMFA: boolean;
+    allowedDomains?: string[];
+    maxLoginAttempts: number;
+    ipWhitelist?: string[];
+  };
+
+  // AI Configuration
+  ai: {
+    provider: 'openai' | 'anthropic' | 'azure';
+    model: string;
+    maxTokens: number;
+    temperature: number;
+    enableAutoSuggestions: boolean;
+    rateLimitPerUser: number;
+  };
+
+  // Storage & Data
+  storage: {
+    maxFileSize: number;
+    maxStoragePerOrg: number;
+    allowedFileTypes: string[];
+    dataRetention: number;
+    autoBackup: boolean;
+  };
+
+  // Maintenance & System
+  system: {
+    maintenanceMode: boolean;
+    maintenanceMessage?: string;
+    registrationOpen: boolean;
+    defaultTimezone: string;
+    dateFormat: string;
+    currency: string;
+  };
 }
