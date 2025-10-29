@@ -43,8 +43,8 @@ export default function ActionStatusChart({ data }: ActionStatusChartProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Action Status Distribution</h3>
+    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Action Status Distribution</h3>
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -63,13 +63,24 @@ export default function ActionStatusChart({ data }: ActionStatusChartProps) {
               ))}
             </Pie>
             <Tooltip content={<CustomTooltip />} />
-            <Legend 
-              verticalAlign="bottom" 
-              height={36}
-              formatter={(value) => <span className="text-sm text-gray-700">{value}</span>}
-            />
           </PieChart>
         </ResponsiveContainer>
+      </div>
+
+      {/* Custom Legend with clear one-glance text */}
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        {chartData.map((entry, index) => (
+          <div key={index} className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-slate-900">
+            <div className="flex items-center space-x-2">
+              <div
+                className="w-4 h-4 rounded-sm flex-shrink-0"
+                style={{ backgroundColor: COLORS[entry.status as keyof typeof COLORS] }}
+              />
+              <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{entry.status}</span>
+            </div>
+            <span className="text-sm font-bold text-gray-900 dark:text-slate-100">{entry.count}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
