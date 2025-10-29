@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { FileText, TrendingUp, AlertTriangle, CheckCircle, Clock, Users } from 'lucide-react';
 import { Project, Component, FailureMode } from '@/types';
 import { useAuth } from '@/lib/store';
@@ -19,6 +19,7 @@ import {
 import { exportToPDF, exportToExcel } from '@/lib/export';
 import toast from 'react-hot-toast';
 import dynamic from 'next/dynamic';
+import html2canvas from 'html2canvas';
 
 // Dynamically import dashboard charts for thumbnail rendering
 const HeatMapChart = dynamic(() => import('@/components/dashboard/HeatMapChart'), { ssr: false });
@@ -81,6 +82,11 @@ export default function SummaryTab({ project }: SummaryTabProps) {
 
   // Export state
   const [isExporting, setIsExporting] = useState(false);
+
+  // Chart refs for capturing images
+  const heatMapRef = useRef<HTMLDivElement>(null);
+  const paretoRef = useRef<HTMLDivElement>(null);
+  const bubbleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadData();
@@ -244,12 +250,70 @@ export default function SummaryTab({ project }: SummaryTabProps) {
         }
       };
 
+      // Capture chart images if including charts and format is PDF
+      let chartImages: { heatMap?: string; pareto?: string; bubble?: string } = {};
+
+      if (format === 'pdf' && includeCharts && components.length > 0 && failureModes.length > 0) {
+        toast.dismiss();
+        toast.loading('Capturing dashboard charts...');
+
+        try {
+          // Capture HeatMap chart
+          if (heatMapRef.current) {
+            const heatMapCanvas = await html2canvas(heatMapRef.current, {
+              scale: 2,
+              logging: false,
+              backgroundColor: '#ffffff'
+            });
+            chartImages.heatMap = heatMapCanvas.toDataURL('image/png');
+          }
+
+          // Capture Pareto chart
+          if (paretoRef.current) {
+            const paretoCanvas = await html2canvas(paretoRef.current, {
+              scale: 2,
+              logging: false,
+              backgroundColor: '#ffffff'
+            });
+            chartImages.pareto = paretoCanvas.toDataURL('image/png');
+          }
+
+          // Capture Bubble chart
+          if (bubbleRef.current) {
+            const bubbleCanvas = await html2canvas(bubbleRef.current, {
+              scale: 2,
+              logging: false,
+              backgroundColor: '#ffffff'
+            });
+            chartImages.bubble = bubbleCanvas.toDataURL('image/png');
+          }
+        } catch (captureError) {
+          console.error('Failed to capture charts:', captureError);
+          // Continue export without chart images
+          chartImages = {};
+        }
+      }
+
+      // Prepare export metadata
+      const exportMetadata = {
+        includeCompliance,
+        includeActions,
+        standards,
+        owner,
+        openActions,
+        completionRate
+      };
+
       // Call the appropriate export function
       if (format === 'pdf') {
-        exportToPDF(projectWithAsset, exportFailureModes, metrics, undefined, components);
+        toast.dismiss();
+        toast.loading('Generating PDF...');
+        exportToPDF(projectWithAsset, exportFailureModes, metrics, undefined, components, chartImages, exportMetadata);
         toast.dismiss();
         toast.success('PDF exported successfully!');
       } else {
+        toast.dismiss();
+        toast.loading('Generating Excel...');
         exportToExcel(projectWithAsset, exportFailureModes, metrics, undefined, components);
         toast.dismiss();
         toast.success('Excel exported successfully!');
@@ -515,17 +579,17 @@ export default function SummaryTab({ project }: SummaryTabProps) {
           {includeCharts && components.length > 0 && failureModes.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <ChartPreview label="RPN Heatmap">
-                <div className="scale-75 origin-top-left w-[133%] h-[133%]">
+                <div ref={heatMapRef} className="scale-75 origin-top-left w-[133%] h-[133%]">
                   <HeatMapChart components={components.slice(0, 2)} />
                 </div>
               </ChartPreview>
               <ChartPreview label="Top Risks (Pareto)">
-                <div className="scale-75 origin-top-left w-[133%] h-[133%]">
+                <div ref={paretoRef} className="scale-75 origin-top-left w-[133%] h-[133%]">
                   <ParetoChart failureModes={failureModes.slice(0, 5)} />
                 </div>
               </ChartPreview>
               <ChartPreview label="Risk Bubble Chart">
-                <div className="scale-75 origin-top-left w-[133%] h-[133%]">
+                <div ref={bubbleRef} className="scale-75 origin-top-left w-[133%] h-[133%]">
                   <RisksBubbleChart failureModes={failureModes.slice(0, 10).map(fm => ({ ...fm, component: components.find(c => c.id === fm.component_id) }))} />
                 </div>
               </ChartPreview>

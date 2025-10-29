@@ -80,7 +80,7 @@ export default function Sidebar() {
 
   if (sidebarCollapsed) {
     return (
-      <div className="w-16 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 min-h-screen">
+      <div className="w-16 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 h-full">
         <div className="p-3 space-y-2">
           {currentProject && (
             <button
@@ -123,7 +123,7 @@ export default function Sidebar() {
   }
 
   return (
-    <div className="w-80 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 min-h-screen overflow-y-auto" data-tour="sidebar">
+    <div className="w-80 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 h-full" data-tour="sidebar">
       {/* Organization Switcher - Always at top */}
       <OrganizationSwitcher />
 
