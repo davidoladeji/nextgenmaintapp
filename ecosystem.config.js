@@ -1,7 +1,7 @@
 module.exports = {
   apps: [{
     name: 'nextmint-fmea',
-    script: 'npm',
+    script: 'pnpm',
     args: 'start',
     cwd: '/home/peerisfh/nextgenmaintapp',
     instances: 1,
