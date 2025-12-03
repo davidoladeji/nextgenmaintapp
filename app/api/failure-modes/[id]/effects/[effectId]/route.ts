@@ -1,3 +1,4 @@
+import { FailureMode, Cause, Effect, Control } from "@/types";
 import { NextRequest, NextResponse } from 'next/server';
 import { readDatabase, writeDatabase } from '@/lib/database-simple';
 
@@ -15,16 +16,19 @@ export async function PATCH(
       potential_cause,
       current_design,
       justification_pre,
+      recommended_actions,
       justification_post,
       responsible,
       action_taken,
+      action_status,
       completion_date,
       severity_post,
       occurrence_post,
       detection_post
     } = body;
 
-    if (!description) {
+    // Only validate description if it's explicitly provided and empty
+    if (description !== undefined && !description) {
       return NextResponse.json(
         { success: false, error: 'Description is required' },
         { status: 400 }
@@ -34,7 +38,7 @@ export async function PATCH(
     const db = readDatabase();
 
     // Verify failure mode exists
-    const failureMode = db.failureModes.find(fm => fm.id === failureModeId);
+    const failureMode = db.failureModes.find((fm: FailureMode) => fm.id === failureModeId);
     if (!failureMode) {
       return NextResponse.json(
         { success: false, error: 'Failure mode not found' },
@@ -43,7 +47,7 @@ export async function PATCH(
     }
 
     // Find and update effect
-    const effectIndex = db.effects.findIndex(e => e.id === effectId);
+    const effectIndex = db.effects.findIndex((e: Effect) => e.id === effectId);
     if (effectIndex === -1) {
       return NextResponse.json(
         { success: false, error: 'Effect not found' },
@@ -59,9 +63,11 @@ export async function PATCH(
       potential_cause: potential_cause !== undefined ? potential_cause : db.effects[effectIndex].potential_cause,
       current_design: current_design !== undefined ? current_design : db.effects[effectIndex].current_design,
       justification_pre: justification_pre !== undefined ? justification_pre : db.effects[effectIndex].justification_pre,
+      recommended_actions: recommended_actions !== undefined ? recommended_actions : db.effects[effectIndex].recommended_actions,
       justification_post: justification_post !== undefined ? justification_post : db.effects[effectIndex].justification_post,
       responsible: responsible !== undefined ? responsible : db.effects[effectIndex].responsible,
       action_taken: action_taken !== undefined ? action_taken : db.effects[effectIndex].action_taken,
+      action_status: action_status !== undefined ? action_status : db.effects[effectIndex].action_status,
       completion_date: completion_date !== undefined ? completion_date : db.effects[effectIndex].completion_date,
       severity_post: severity_post !== undefined ? parseInt(severity_post) : db.effects[effectIndex].severity_post,
       occurrence_post: occurrence_post !== undefined ? parseInt(occurrence_post) : db.effects[effectIndex].occurrence_post,
@@ -97,7 +103,7 @@ export async function DELETE(
     const db = readDatabase();
 
     // Verify failure mode exists
-    const failureMode = db.failureModes.find(fm => fm.id === failureModeId);
+    const failureMode = db.failureModes.find((fm: FailureMode) => fm.id === failureModeId);
     if (!failureMode) {
       return NextResponse.json(
         { success: false, error: 'Failure mode not found' },
@@ -106,7 +112,7 @@ export async function DELETE(
     }
 
     // Find effect
-    const effectIndex = db.effects.findIndex(e => e.id === effectId);
+    const effectIndex = db.effects.findIndex((e: Effect) => e.id === effectId);
     if (effectIndex === -1) {
       return NextResponse.json(
         { success: false, error: 'Effect not found' },

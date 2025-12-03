@@ -5,13 +5,14 @@ import { Project, Component as BackendComponent, FailureMode as BackendFailureMo
 import { useAuth } from '@/lib/store';
 import { Component, FailureMode, Effect, CreateComponentInput, CreateFailureModeInput, CreateEffectInput } from '@/lib/types/fmea';
 import { ComponentRow } from './ComponentRow';
-import { Plus } from 'lucide-react';
+import { Plus, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { SelectionToolbar } from './SelectionToolbar';
 import { EditOwnerModal } from './EditOwnerModal';
 import { SimpleEditModal } from './SimpleEditModal';
 import { motion } from 'framer-motion';
 import { generateAIDuplicateNameWithToast } from '@/lib/ai-utils';
+import { useRiskSettings } from '@/lib/stores/riskSettingsStore';
 
 interface SmartTableIntegratedProps {
   project: Project;
@@ -20,6 +21,8 @@ interface SmartTableIntegratedProps {
 
 export function SmartTableIntegrated({ project, components: backendComponents }: SmartTableIntegratedProps) {
   const { token } = useAuth();
+  const { matrixSize, scaleType, thresholds, getRPNColor, getRPNLabel } = useRiskSettings();
+  const maxRating = scaleType === '1-5' ? 5 : 10;
   const [components, setComponents] = useState<Component[]>([]);
   const [expandedComponents, setExpandedComponents] = useState<Set<string>>(new Set());
   const [expandedFailureModes, setExpandedFailureModes] = useState<Set<string>>(new Set());
@@ -178,8 +181,21 @@ export function SmartTableIntegrated({ project, components: backendComponents }:
 
       if (result.success) {
         toast.success('Component added successfully');
-        // Reload components (parent will update backendComponents prop)
-        window.location.reload(); // Simple reload for now
+
+        // Update local state with new component
+        const newComponent = result.data;
+
+        setComponents(prev => [
+          ...prev,
+          {
+            id: newComponent.id,
+            name: newComponent.name,
+            function: newComponent.function || newComponent.description || '',
+            failureModes: [],
+            createdAt: new Date(newComponent.created_at),
+            updatedAt: new Date(newComponent.updated_at),
+          }
+        ]);
       } else {
         toast.error(result.error || 'Failed to add component');
       }
@@ -210,7 +226,29 @@ export function SmartTableIntegrated({ project, components: backendComponents }:
 
       if (result.success) {
         toast.success('Failure mode added successfully');
-        window.location.reload();
+
+        // Update local state with new failure mode
+        const newFailureMode = result.data;
+
+        setComponents(prev => prev.map(comp =>
+          comp.id === selectedComponentId
+            ? {
+                ...comp,
+                failureModes: [
+                  ...comp.failureModes,
+                  {
+                    id: newFailureMode.id,
+                    componentId: comp.id,
+                    name: newFailureMode.failure_mode || newFailureMode.name,
+                    owner: newFailureMode.owner || '',
+                    effects: [],
+                    createdAt: new Date(newFailureMode.created_at),
+                    updatedAt: new Date(newFailureMode.updated_at),
+                  }
+                ]
+              }
+            : comp
+        ));
       } else {
         toast.error(result.error || 'Failed to add failure mode');
       }
@@ -252,7 +290,47 @@ export function SmartTableIntegrated({ project, components: backendComponents }:
 
       if (result.success) {
         toast.success('Effect added successfully');
-        window.location.reload();
+
+        // Update local state instead of reloading the page
+        const newEffect = result.data;
+
+        setComponents(prev => prev.map(comp => ({
+          ...comp,
+          failureModes: comp.failureModes.map(fm =>
+            fm.id === selectedFailureModeId
+              ? {
+                  ...fm,
+                  effects: [
+                    ...fm.effects,
+                    {
+                      id: newEffect.id,
+                      failureModeId: fm.id,
+                      effects: newEffect.description || '',
+                      sev: newEffect.severity || 5,
+                      potentialCause: newEffect.potential_cause || '',
+                      occ: newEffect.occurrence || 5,
+                      currentDesign: newEffect.current_design || '',
+                      det: newEffect.detection || 5,
+                      justificationPre: newEffect.justification_pre || '',
+                      rpnPre: (newEffect.severity || 5) * (newEffect.occurrence || 5) * (newEffect.detection || 5),
+                      recommendedActions: '',
+                      justificationPost: newEffect.justification_post || '',
+                      responsible: newEffect.responsible || '',
+                      actionStatus: (newEffect.action_status || 'Not Started') as 'Not Started' | 'In Progress' | 'Done',
+                      sevPost: newEffect.severity_post || newEffect.severity || 5,
+                      occPost: newEffect.occurrence_post || newEffect.occurrence || 5,
+                      detPost: newEffect.detection_post || newEffect.detection || 5,
+                      rpnPost: (newEffect.severity_post || newEffect.severity || 5) *
+                               (newEffect.occurrence_post || newEffect.occurrence || 5) *
+                               (newEffect.detection_post || newEffect.detection || 5),
+                      createdAt: new Date(newEffect.created_at),
+                      updatedAt: new Date(newEffect.updated_at),
+                    }
+                  ]
+                }
+              : fm
+          )
+        })));
       } else {
         toast.error(result.error || 'Failed to add effect');
       }
@@ -285,6 +363,7 @@ export function SmartTableIntegrated({ project, components: backendComponents }:
           current_design: updates.currentDesign,
           detection: updates.det,
           justification_pre: updates.justificationPre,
+          recommended_actions: updates.recommendedActions,
           severity_post: updates.sevPost,
           occurrence_post: updates.occPost,
           detection_post: updates.detPost,
@@ -1002,6 +1081,7 @@ export function SmartTableIntegrated({ project, components: backendComponents }:
             handleAddComponent(data);
             setShowComponentModal(false);
           }}
+          project={project}
         />
       )}
 
@@ -1012,6 +1092,9 @@ export function SmartTableIntegrated({ project, components: backendComponents }:
             handleAddFailureMode(data);
             setShowFailureModeModal(false);
           }}
+          project={project}
+          componentId={selectedComponentId}
+          components={components}
         />
       )}
 
@@ -1022,6 +1105,9 @@ export function SmartTableIntegrated({ project, components: backendComponents }:
             handleAddEffect(data);
             setShowEffectModal(false);
           }}
+          project={project}
+          failureModeId={selectedFailureModeId}
+          components={components}
         />
       )}
 
@@ -1114,6 +1200,7 @@ interface ComponentRowIntegratedProps {
 }
 
 function ComponentRowIntegrated(props: ComponentRowIntegratedProps) {
+  const { getRPNColor } = useRiskSettings();
   const viewModel = props.getComponentViewModel(props.component.id);
   if (!viewModel) return null;
 
@@ -1172,15 +1259,13 @@ function ComponentRowIntegrated(props: ComponentRowIntegratedProps) {
             <span className="text-gray-400 dark:text-slate-500">|</span>
             <div className="flex items-center gap-2 flex-shrink-0">
               <span className="text-sm text-gray-600 dark:text-slate-400">Highest RPN:</span>
-              <span className={`px-2.5 py-1 text-sm font-bold rounded-md ${
-                viewModel.highestRPN >= 150
-                  ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
-                  : viewModel.highestRPN >= 100
-                  ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300'
-                  : viewModel.highestRPN >= 70
-                  ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
-                  : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
-              }`}>
+              <span
+                className="px-2.5 py-1 text-sm font-bold rounded-md"
+                style={{
+                  backgroundColor: `${getRPNColor(viewModel.highestRPN)}20`,
+                  color: getRPNColor(viewModel.highestRPN),
+                }}
+              >
                 {viewModel.highestRPN}
               </span>
             </div>
@@ -1398,6 +1483,8 @@ interface EffectRowIntegratedProps {
 
 function EffectRowIntegrated({ effect, isEven, isSelected, onUpdate, onSelect }: EffectRowIntegratedProps) {
   const { formatRPN } = useRPNCalculation();
+  const { scaleType, thresholds } = useRiskSettings();
+  const maxRating = scaleType === '1-5' ? 5 : 10;
   const rpnPreFormatted = formatRPN(effect.sev, effect.occ, effect.det);
   const rpnPostFormatted = formatRPN(effect.sevPost, effect.occPost, effect.detPost);
 
@@ -1413,24 +1500,24 @@ function EffectRowIntegrated({ effect, isEven, isSelected, onUpdate, onSelect }:
       }`}
     >
       <EditableCell value={effect.effects} onSave={(value) => onUpdate({ effects: value })} />
-      <NumberCell value={effect.sev} min={1} max={10} onSave={(value) => onUpdate({ sev: value })} />
+      <NumberCell value={effect.sev} min={1} max={maxRating} onSave={(value) => onUpdate({ sev: value })} />
       <EditableCell value={effect.potentialCause} onSave={(value) => onUpdate({ potentialCause: value })} />
-      <NumberCell value={effect.occ} min={1} max={10} onSave={(value) => onUpdate({ occ: value })} />
+      <NumberCell value={effect.occ} min={1} max={maxRating} onSave={(value) => onUpdate({ occ: value })} />
       <EditableCell value={effect.currentDesign} onSave={(value) => onUpdate({ currentDesign: value })} />
-      <NumberCell value={effect.det} min={1} max={10} onSave={(value) => onUpdate({ det: value })} />
+      <NumberCell value={effect.det} min={1} max={maxRating} onSave={(value) => onUpdate({ det: value })} />
       <EditableCell value={effect.justificationPre} onSave={(value) => onUpdate({ justificationPre: value })} />
       <td className="px-4 py-3 text-sm">
-        <RPNBadge value={effect.rpnPre} showLabel={true} showTooltip={true} formula={rpnPreFormatted.formula} />
+        <RPNBadge value={effect.rpnPre} showLabel={true} showTooltip={true} formula={rpnPreFormatted.formula} thresholds={thresholds} />
       </td>
       <EditableCell value={effect.recommendedActions} onSave={(value) => onUpdate({ recommendedActions: value })} />
       <EditableCell value={effect.justificationPost} onSave={(value) => onUpdate({ justificationPost: value })} />
       <EditableCell value={effect.responsible} onSave={(value) => onUpdate({ responsible: value })} />
       <ActionStatusCell value={effect.actionStatus} onSave={(value) => onUpdate({ actionStatus: value })} />
-      <NumberCell value={effect.sevPost} min={1} max={10} onSave={(value) => onUpdate({ sevPost: value })} />
-      <NumberCell value={effect.occPost} min={1} max={10} onSave={(value) => onUpdate({ occPost: value })} />
-      <NumberCell value={effect.detPost} min={1} max={10} onSave={(value) => onUpdate({ detPost: value })} />
+      <NumberCell value={effect.sevPost} min={1} max={maxRating} onSave={(value) => onUpdate({ sevPost: value })} />
+      <NumberCell value={effect.occPost} min={1} max={maxRating} onSave={(value) => onUpdate({ occPost: value })} />
+      <NumberCell value={effect.detPost} min={1} max={maxRating} onSave={(value) => onUpdate({ detPost: value })} />
       <td className="px-4 py-3 text-sm">
-        <RPNBadge value={effect.rpnPost} showLabel={true} showTooltip={true} formula={rpnPostFormatted.formula} />
+        <RPNBadge value={effect.rpnPost} showLabel={true} showTooltip={true} formula={rpnPostFormatted.formula} thresholds={thresholds} />
       </td>
     </tr>
   );
@@ -1621,11 +1708,93 @@ function ActionStatusCell({ value, onSave }: ActionStatusCellProps) {
 interface ComponentModalProps {
   onClose: () => void;
   onSave: (data: { name: string; function: string }) => void;
+  project: Project;
 }
 
-function ComponentModal({ onClose, onSave }: ComponentModalProps) {
+function ComponentModal({ onClose, onSave, project }: ComponentModalProps) {
+  const { token } = useAuth();
   const [name, setName] = useState('');
   const [functionDesc, setFunctionDesc] = useState('');
+  const [isAutoFilling, setIsAutoFilling] = useState(false);
+
+  const handleAutoFill = async () => {
+    if (!token) {
+      toast.error('Unable to auto-fill. Please fill manually.');
+      return;
+    }
+
+    setIsAutoFilling(true);
+    try {
+      // Get AI suggestion for component name if empty
+      if (!name || name.trim() === '') {
+        const nameResponse = await fetch('/api/ai/duplicate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            type: 'component',
+            originalName: 'New Component',
+            context: {
+              projectName: project.name,
+              projectDescription: project.description || '',
+              assetName: project.asset?.name || project.asset,
+              assetType: project.asset?.type || '',
+              assetContext: project.asset?.context || '',
+              criticality: project.asset?.criticality || 'medium',
+              standards: Array.isArray(project.asset?.standards)
+                ? project.asset.standards
+                : [],
+            },
+          }),
+        });
+
+        const nameResult = await nameResponse.json();
+        if (nameResult.success && nameResult.data?.name) {
+          setName(nameResult.data.name);
+        }
+      }
+
+      // Get AI suggestion for function if empty
+      if (!functionDesc || functionDesc.trim() === '') {
+        // Wait for name to be set first if it's being generated
+        const componentName = name || 'Component';
+
+        const functionResponse = await fetch('/api/ai/duplicate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            type: 'componentFunction',
+            originalName: componentName,
+            context: {
+              projectName: project.name,
+              projectDescription: project.description || '',
+              assetName: project.asset?.name || project.asset,
+              assetType: project.asset?.type || '',
+              assetContext: project.asset?.context || '',
+              componentName: componentName,
+            },
+          }),
+        });
+
+        const functionResult = await functionResponse.json();
+        if (functionResult.success && functionResult.data?.name) {
+          setFunctionDesc(functionResult.data.name);
+        }
+      }
+
+      toast.success('Form auto-filled with AI suggestions!');
+    } catch (error) {
+      console.error('Auto-fill error:', error);
+      toast.error('Auto-fill failed. Please fill manually.');
+    } finally {
+      setIsAutoFilling(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1637,7 +1806,27 @@ function ComponentModal({ onClose, onSave }: ComponentModalProps) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
       <div className="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100 mb-4">Add Component</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100">Add Component</h3>
+          <button
+            type="button"
+            onClick={handleAutoFill}
+            disabled={isAutoFilling}
+            className="flex items-center gap-2 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white rounded-lg transition-colors text-sm font-medium"
+          >
+            {isAutoFilling ? (
+              <>
+                <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Auto-filling...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-3 h-3" />
+                Auto-fill
+              </>
+            )}
+          </button>
+        </div>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Component Name</label>
@@ -1660,11 +1849,64 @@ function ComponentModal({ onClose, onSave }: ComponentModalProps) {
 interface FailureModeModalProps {
   onClose: () => void;
   onSave: (data: { name: string; owner: string }) => void;
+  project: Project;
+  componentId: string | null;
+  components: Component[];
 }
 
-function FailureModeModal({ onClose, onSave }: FailureModeModalProps) {
+function FailureModeModal({ onClose, onSave, project, componentId, components }: FailureModeModalProps) {
+  const { token } = useAuth();
   const [name, setName] = useState('');
   const [owner, setOwner] = useState('');
+  const [isAutoFilling, setIsAutoFilling] = useState(false);
+
+  // Find the selected component for AI context
+  const selectedComponent = components.find((c) => c.id === componentId);
+
+  const handleAutoFill = async () => {
+    if (!token || !selectedComponent) {
+      toast.error('Unable to auto-fill. Please fill manually.');
+      return;
+    }
+
+    setIsAutoFilling(true);
+    try {
+      // Get AI suggestion for failure mode name if empty
+      if (!name || name.trim() === '') {
+        const nameResponse = await fetch('/api/ai/duplicate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            type: 'failureMode',
+            originalName: 'Equipment Failure',
+            context: {
+              componentName: selectedComponent.name,
+            },
+          }),
+        });
+
+        const nameResult = await nameResponse.json();
+        if (nameResult.success && nameResult.data?.name) {
+          setName(nameResult.data.name);
+        }
+      }
+
+      // Set default owner if empty
+      if (!owner || owner.trim() === '') {
+        setOwner('Maintenance Team');
+      }
+
+      toast.success('Form auto-filled with AI suggestions!');
+    } catch (error) {
+      console.error('Auto-fill error:', error);
+      toast.error('Auto-fill failed. Please fill manually.');
+    } finally {
+      setIsAutoFilling(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1676,7 +1918,27 @@ function FailureModeModal({ onClose, onSave }: FailureModeModalProps) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
       <div className="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100 mb-4">Add Failure Mode</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100">Add Failure Mode</h3>
+          <button
+            type="button"
+            onClick={handleAutoFill}
+            disabled={isAutoFilling}
+            className="flex items-center gap-2 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white rounded-lg transition-colors text-sm font-medium"
+          >
+            {isAutoFilling ? (
+              <>
+                <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Auto-filling...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-3 h-3" />
+                Auto-fill
+              </>
+            )}
+          </button>
+        </div>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Failure Mode Name</label>
@@ -1699,9 +1961,15 @@ function FailureModeModal({ onClose, onSave }: FailureModeModalProps) {
 interface EffectModalProps {
   onClose: () => void;
   onSave: (data: CreateEffectInput) => void;
+  project: Project;
+  failureModeId: string | null;
+  components: Component[];
 }
 
-function EffectModal({ onClose, onSave }: EffectModalProps) {
+function EffectModal({ onClose, onSave, project, failureModeId, components }: EffectModalProps) {
+  const { token } = useAuth();
+  const { scaleType } = useRiskSettings();
+  const maxRating = scaleType === '1-5' ? 5 : 10;
   const [effects, setEffects] = useState('');
   const [sev, setSev] = useState(5);
   const [potentialCause, setPotentialCause] = useState('');
@@ -1716,6 +1984,327 @@ function EffectModal({ onClose, onSave }: EffectModalProps) {
   const [sevPost, setSevPost] = useState(3);
   const [occPost, setOccPost] = useState(3);
   const [detPost, setDetPost] = useState(3);
+  const [isAutoFilling, setIsAutoFilling] = useState(false);
+
+  // Find the selected failure mode for AI context
+  const selectedFailureMode = components
+    .flatMap((c) => c.failureModes)
+    .find((fm) => fm.id === failureModeId);
+
+  const handleAutoFill = async () => {
+    if (!token || !selectedFailureMode) {
+      toast.error('Unable to auto-fill. Please fill manually.');
+      return;
+    }
+
+    // Debug logging to understand what data we're working with
+    console.log('🔍 Auto-fill Debug - Selected Failure Mode:', {
+      id: selectedFailureMode?.id,
+      name: selectedFailureMode?.name,
+      owner: selectedFailureMode?.owner,
+      full_object: selectedFailureMode
+    });
+
+    setIsAutoFilling(true);
+    try {
+      // Declare result variables at function scope
+      let effectsResult: any = null;
+      let causesResult: any = null;
+      let controlsResult: any = null;
+
+      // Get AI suggestions for effects
+      if (!effects || effects.trim() === '') {
+        const effectsResponse = await fetch('/api/ai/suggest', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            type: 'effects',
+            context: {
+              asset: project.asset,
+              failureMode: {
+                failure_mode: selectedFailureMode.name,
+                process_step: 'Operation',
+              },
+            },
+          }),
+        });
+
+        effectsResult = await effectsResponse.json();
+        if (effectsResult.success && effectsResult.data?.suggestions?.[0]?.text) {
+          setEffects(effectsResult.data.suggestions[0].text);
+        }
+      }
+
+      // Small delay to space out API requests
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Get AI suggestions for causes (potential cause field)
+      if (!potentialCause || potentialCause.trim() === '') {
+        const causesResponse = await fetch('/api/ai/suggest', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            type: 'causes',
+            context: {
+              asset: project.asset,
+              failureMode: {
+                failure_mode: selectedFailureMode.name,
+                process_step: 'Operation',
+              },
+            },
+          }),
+        });
+
+        causesResult = await causesResponse.json();
+        if (causesResult.success && causesResult.data?.suggestions?.[0]?.text) {
+          setPotentialCause(causesResult.data.suggestions[0].text);
+        }
+      }
+
+      // Small delay to space out API requests
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Get AI suggestions for controls (current design field)
+      if (!currentDesign || currentDesign.trim() === '') {
+        const controlsResponse = await fetch('/api/ai/suggest', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            type: 'controls',
+            context: {
+              asset: project.asset,
+              failureMode: {
+                failure_mode: selectedFailureMode.name,
+                process_step: 'Operation',
+              },
+            },
+          }),
+        });
+
+        controlsResult = await controlsResponse.json();
+        if (controlsResult.success && controlsResult.data?.suggestions?.[0]?.text) {
+          setCurrentDesign(controlsResult.data.suggestions[0].text);
+        }
+      }
+
+      // Small delay to space out API requests
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Get AI-suggested risk scores for pre-mitigation
+      // Severity score based on effect
+      const severityResponse = await fetch('/api/ai/suggest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          type: 'severity',
+          context: {
+            asset: project.asset,
+            failureMode: {
+              failure_mode: selectedFailureMode.name,
+              process_step: 'Operation',
+            },
+            effect: {
+              description: effects || 'Potential operational impact',
+            },
+          },
+        }),
+      });
+
+      const severityResult = await severityResponse.json();
+      if (severityResult.success && severityResult.data?.score) {
+        setSev(severityResult.data.score);
+      }
+
+      // Small delay to space out API requests
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Occurrence score based on cause
+      const occurrenceResponse = await fetch('/api/ai/suggest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          type: 'occurrence',
+          context: {
+            asset: project.asset,
+            failureMode: {
+              failure_mode: selectedFailureMode.name,
+              process_step: 'Operation',
+            },
+            cause: {
+              description: potentialCause || 'Typical degradation',
+            },
+          },
+        }),
+      });
+
+      const occurrenceResult = await occurrenceResponse.json();
+      if (occurrenceResult.success && occurrenceResult.data?.score) {
+        setOcc(occurrenceResult.data.score);
+      }
+
+      // Small delay to space out API requests
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Detection score based on controls
+      const detectionResponse = await fetch('/api/ai/suggest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          type: 'detection',
+          context: {
+            asset: project.asset,
+            failureMode: {
+              failure_mode: selectedFailureMode.name,
+              process_step: 'Operation',
+            },
+            control: {
+              description: currentDesign || 'Standard inspection procedures',
+            },
+          },
+        }),
+      });
+
+      const detectionResult = await detectionResponse.json();
+      if (detectionResult.success && detectionResult.data?.score) {
+        setDet(detectionResult.data.score);
+      }
+
+      // Generate Pre-Mitigation Justification
+      // Use the fetched values from API results
+      const effectText = effectsResult?.data?.suggestions?.[0]?.text || effects || 'Potential operational impact';
+      const causeText = causesResult?.data?.suggestions?.[0]?.text || potentialCause || 'Typical degradation';
+      const controlText = controlsResult?.data?.suggestions?.[0]?.text || currentDesign || 'Standard procedures';
+      const sevScore = severityResult.data?.score || sev;
+      const occScore = occurrenceResult.data?.score || occ;
+      const detScore = detectionResult.data?.score || det;
+
+      // Small delay to space out API requests
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const justificationPrePrompt = `Based on this FMEA analysis, provide a brief justification (2-3 sentences) for the pre-mitigation risk ratings:
+
+Effect: ${effectText}
+Severity (${sevScore}/10): Risk to safety/operations
+Potential Cause: ${causeText}
+Occurrence (${occScore}/10): Frequency of cause
+Current Controls: ${controlText}
+Detection (${detScore}/10): Ability to detect before impact
+
+Explain why these specific ratings are appropriate given the asset type and failure mode. Keep it concise and technical.`;
+
+      const justificationPreResponse = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          message: justificationPrePrompt,
+          context: {
+            currentProject: project,
+          },
+        }),
+      });
+
+      const justPreResult = await justificationPreResponse.json();
+      if (justPreResult.success && justPreResult.data?.message) {
+        setJustificationPre(justPreResult.data.message);
+      }
+
+      // Calculate post-mitigation scores
+      // Severity typically stays same or slightly reduces (effects don't change much)
+      const calculatedSevPost = Math.max(1, Math.round(severityResult.data?.score * 0.9) || 3);
+      setSevPost(calculatedSevPost);
+
+      // Occurrence reduces significantly with good actions (30-40% reduction)
+      const calculatedOccPost = Math.max(1, Math.round(occurrenceResult.data?.score * 0.6) || 3);
+      setOccPost(calculatedOccPost);
+
+      // Detection improves significantly with better controls (40-50% reduction)
+      const calculatedDetPost = Math.max(1, Math.round(detectionResult.data?.score * 0.5) || 3);
+      setDetPost(calculatedDetPost);
+
+      // Fill recommended actions if empty
+      const recommendedActionsText = 'Implement corrective measures and monitoring';
+      if (!recommendedActions || recommendedActions.trim() === '') {
+        setRecommendedActions(recommendedActionsText);
+      }
+
+      // Fill responsible if empty
+      if (!responsible || responsible.trim() === '') {
+        setResponsible('Maintenance Team');
+      }
+
+      // Small delay to space out API requests
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Generate Post-Mitigation Justification
+      const justificationPostPrompt = `Based on the recommended actions, provide a brief justification (2-3 sentences) for the post-mitigation risk ratings:
+
+Recommended Actions: ${recommendedActionsText}
+Severity (Post): ${calculatedSevPost}/10 (was ${sevScore}/10)
+Occurrence (Post): ${calculatedOccPost}/10 (was ${occScore}/10)
+Detection (Post): ${calculatedDetPost}/10 (was ${detScore}/10)
+
+Explain how the recommended actions will reduce these specific risk factors and improve overall safety/reliability. Keep it concise and technical.`;
+
+      const justificationPostResponse = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          message: justificationPostPrompt,
+          context: {
+            currentProject: project,
+          },
+        }),
+      });
+
+      const justPostResult = await justificationPostResponse.json();
+      if (justPostResult.success && justPostResult.data?.message) {
+        setJustificationPost(justPostResult.data.message);
+      }
+
+      // Check which API calls succeeded
+      const failedCalls = [];
+      if (!effectsResult || !effectsResult.success) failedCalls.push('effects');
+      if (!causesResult || !causesResult.success) failedCalls.push('causes');
+      if (!controlsResult || !controlsResult.success) failedCalls.push('controls');
+
+      if (failedCalls.length > 0) {
+        console.warn('⚠️ Some AI suggestions used fallbacks:', failedCalls);
+        toast.warning(`Using generic suggestions for ${failedCalls.join(', ')} - AI service limited`);
+      } else {
+        console.log('✅ All AI suggestions successfully generated');
+        toast.success('Form auto-filled with AI suggestions!');
+      }
+    } catch (error) {
+      console.error('Auto-fill error:', error);
+      toast.error('Auto-fill failed. Please fill manually.');
+    } finally {
+      setIsAutoFilling(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1740,61 +2329,158 @@ function EffectModal({ onClose, onSave }: EffectModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto" onClick={onClose}>
-      <div className="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-2xl m-4" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100 mb-4">Add Effect</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-white dark:bg-slate-800 rounded-lg w-full max-w-6xl max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+        {/* Fixed Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-slate-700">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-slate-100">Add Effect</h3>
+          <button
+            type="button"
+            onClick={handleAutoFill}
+            disabled={isAutoFilling}
+            className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white rounded-lg transition-colors text-sm font-medium"
+          >
+            {isAutoFilling ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Auto-filling...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4" />
+                Auto-fill with AI
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Scrollable Content */}
+        <div className="overflow-y-auto flex-1 p-6">
+          <form onSubmit={handleSubmit} className="space-y-4" id="effect-form">
           <div className="border-b border-gray-200 dark:border-slate-700 pb-4">
             <h4 className="text-md font-semibold text-gray-800 dark:text-slate-200 mb-3">Pre-Mitigation</h4>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
+              {/* Column 1: Effect Description & Severity */}
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Effect Description</label>
                 <input type="text" value={effects} onChange={(e) => setEffects(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100" placeholder="e.g., Safety hazard, Plant downtime" required />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Severity (1-10)</label>
-                <input type="number" min="1" max="10" value={sev} onChange={(e) => setSev(parseInt(e.target.value))} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100" required />
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Severity (1-{maxRating})</label>
+                <input type="number" min="1" max={maxRating} value={sev} onChange={(e) => setSev(parseInt(e.target.value))} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100" required />
               </div>
+
+              {/* Column 2: Potential Cause & Occurrence */}
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Potential Cause</label>
                 <input type="text" value={potentialCause} onChange={(e) => setPotentialCause(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100" placeholder="e.g., Worn seal, Age degradation" required />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Occurrence (1-10)</label>
-                <input type="number" min="1" max="10" value={occ} onChange={(e) => setOcc(parseInt(e.target.value))} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100" required />
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Occurrence (1-{maxRating})</label>
+                <input type="number" min="1" max={maxRating} value={occ} onChange={(e) => setOcc(parseInt(e.target.value))} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100" required />
               </div>
+
+              {/* Column 3: Current Design Controls & Detection */}
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Current Design Controls</label>
                 <input type="text" value={currentDesign} onChange={(e) => setCurrentDesign(e.target.value)} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100" placeholder="e.g., Regular inspection, Visual checks" required />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Detection (1-10)</label>
-                <input type="number" min="1" max="10" value={det} onChange={(e) => setDet(parseInt(e.target.value))} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100" required />
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Detection (1-{maxRating})</label>
+                <input type="number" min="1" max={maxRating} value={det} onChange={(e) => setDet(parseInt(e.target.value))} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100" required />
+              </div>
+
+              {/* Justification (Pre) - Full width */}
+              <div className="col-span-3">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Justification (Pre-Mitigation)</label>
+                <textarea
+                  value={justificationPre}
+                  onChange={(e) => setJustificationPre(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
+                  placeholder="Justification for pre-mitigation ratings..."
+                  rows={2}
+                />
               </div>
             </div>
           </div>
+
+          {/* Post-Mitigation Section */}
           <div>
             <h4 className="text-md font-semibold text-gray-800 dark:text-slate-200 mb-3">Post-Mitigation</h4>
             <div className="grid grid-cols-3 gap-4">
+              {/* Recommended Actions - Full width */}
+              <div className="col-span-3">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Recommended Actions</label>
+                <textarea
+                  value={recommendedActions}
+                  onChange={(e) => setRecommendedActions(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
+                  placeholder="Describe recommended corrective actions..."
+                  rows={2}
+                />
+              </div>
+
+              {/* Justification (Post) - Full width */}
+              <div className="col-span-3">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Justification (Post-Mitigation)</label>
+                <textarea
+                  value={justificationPost}
+                  onChange={(e) => setJustificationPost(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
+                  placeholder="Justification for post-mitigation ratings..."
+                  rows={2}
+                />
+              </div>
+
+              {/* Responsible Person */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Responsible</label>
+                <input
+                  type="text"
+                  value={responsible}
+                  onChange={(e) => setResponsible(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
+                  placeholder="Person responsible"
+                />
+              </div>
+
+              {/* Action Status */}
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Action Status</label>
+                <select
+                  value={actionStatus}
+                  onChange={(e) => setActionStatus(e.target.value as 'Not Started' | 'In Progress' | 'Done')}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100"
+                >
+                  <option value="Not Started">Not Started</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Done">Done</option>
+                </select>
+              </div>
+
+              {/* Post-Mitigation Ratings */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">SEV (Post)</label>
-                <input type="number" min="1" max="10" value={sevPost} onChange={(e) => setSevPost(parseInt(e.target.value))} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100" />
+                <input type="number" min="1" max={maxRating} value={sevPost} onChange={(e) => setSevPost(parseInt(e.target.value))} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">OCC (Post)</label>
-                <input type="number" min="1" max="10" value={occPost} onChange={(e) => setOccPost(parseInt(e.target.value))} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100" />
+                <input type="number" min="1" max={maxRating} value={occPost} onChange={(e) => setOccPost(parseInt(e.target.value))} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">DET (Post)</label>
-                <input type="number" min="1" max="10" value={detPost} onChange={(e) => setDetPost(parseInt(e.target.value))} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100" />
+                <input type="number" min="1" max={maxRating} value={detPost} onChange={(e) => setDetPost(parseInt(e.target.value))} className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100" />
               </div>
             </div>
           </div>
-          <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-slate-700">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">Cancel</button>
-            <button type="submit" className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md transition-colors">Add Effect</button>
-          </div>
-        </form>
+          </form>
+        </div>
+
+        {/* Fixed Footer */}
+        <div className="flex justify-end gap-2 p-6 border-t border-gray-200 dark:border-slate-700">
+          <button type="button" onClick={onClose} className="px-4 py-2 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">Cancel</button>
+          <button type="submit" form="effect-form" className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md transition-colors">Add Effect</button>
+        </div>
       </div>
     </div>
   );
