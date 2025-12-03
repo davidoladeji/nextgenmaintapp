@@ -1,0 +1,80 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check for merge conflicts
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          if git diff --name-only --diff-filter=U origin/${{ github.base_ref }}..HEAD | grep .; then
+            echo "❌ Merge conflicts detected"
+            exit 1
+          else
+            echo "✅ No merge conflicts"
+          fi
+
+      - name: Validate commit messages
+        run: |
+          echo "Checking commit messages..."
+          git log origin/${{ github.base_ref }}..HEAD --pretty=format:"%s" > commits.txt
+          if grep -q "WIP\|wip\|fixup\|squash" commits.txt; then
+            echo "⚠️ Warning: Found WIP or fixup commits"
+          else
+            echo "✅ Commit messages look good"
+          fi
+
+      - name: Check file sizes
+        run: |
+          echo "Checking for large files..."
+          find . -type f -size +1M -not -path '*/node_modules/*' -not -path '*/.next/*' -not -path '*/dist/*' | while read file; do
+            size=$(du -h "$file" | cut -f1)
+            echo "⚠️ Large file detected: $file ($size)"
+          done
+
+      - name: Build check
+        run: pnpm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: Comment on PR
+        uses: actions/github-script@v6
+        if: always()
+        with:
+          script: |
+            const status = '${{ job.status }}';
+            const emoji = status === 'success' ? '✅' : '❌';
+            const message = status === 'success'
+              ? 'All checks passed! Ready for review.'
+              : 'Some checks failed. Please review the logs.';
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `${emoji} **PR Validation**\n\n${message}\n\n[View Details](${context.payload.pull_request.html_url}/checks)`
+            })
