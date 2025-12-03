@@ -16,7 +16,7 @@ jobs:
 
     environment:
       name: production
-      url: https://your-domain.com
+      url: https://ngmapp.codesett.com
 
     steps:
       - name: Checkout code
@@ -40,43 +40,20 @@ jobs:
         env:
           NEXT_TELEMETRY_DISABLED: 1
 
-      - name: Run deployment script
-        run: |
-          echo "Deployment would happen here"
-          echo "Configure your deployment method (Vercel, Railway, VPS, etc.)"
-
-      # Uncomment and configure based on your deployment method:
-
-      # For Vercel:
-      # - name: Deploy to Vercel
-      #   uses: amondnet/vercel-action@v25
-      #   with:
-      #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
-      #     vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-      #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-      #     vercel-args: '--prod'
-
-      # For Railway:
-      # - name: Deploy to Railway
-      #   uses: bervProject/railway-deploy@main
-      #   with:
-      #     railway_token: ${{ secrets.RAILWAY_TOKEN }}
-      #     service: ${{ secrets.RAILWAY_SERVICE }}
-
-      # For SSH/VPS Deployment:
-      # - name: Deploy to VPS
-      #   uses: appleboy/ssh-action@master
-      #   with:
-      #     host: ${{ secrets.SSH_HOST }}
-      #     username: ${{ secrets.SSH_USERNAME }}
-      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     port: ${{ secrets.SSH_PORT }}
-      #     script: |
-      #       cd /path/to/your/app
-      #       git pull origin main
-      #       pnpm install --frozen-lockfile
-      #       pnpm run build
-      #       pm2 restart nextmint-app
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /home/peerisfh/nextgenmaintapp
+            git pull origin main
+            pnpm install --frozen-lockfile
+            pnpm run build
+            pm2 restart nextmint-fmea
+            pm2 save
 
       - name: Deployment Status
         if: success()

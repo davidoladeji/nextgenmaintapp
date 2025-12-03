@@ -58,11 +58,45 @@ For deployment workflows, configure these secrets in GitHub:
 - `RAILWAY_TOKEN`: Your Railway authentication token
 - `RAILWAY_SERVICE`: Your Railway service name
 
-#### For VPS/SSH Deployment:
-- `SSH_HOST`: Your server hostname or IP
-- `SSH_USERNAME`: SSH username
-- `SSH_PRIVATE_KEY`: SSH private key
+#### For VPS/SSH Deployment (Currently Configured):
+- `SSH_HOST`: Your server hostname or IP (e.g., 159.198.66.158)
+- `SSH_USERNAME`: SSH username (e.g., root)
+- `SSH_PRIVATE_KEY`: SSH private key content (the entire private key file)
 - `SSH_PORT`: SSH port (usually 22)
+
+**Setup Instructions for VPS Deployment:**
+
+1. **Generate SSH Key Pair** (if not already done):
+   ```bash
+   ssh-keygen -t ed25519 -f ~/.ssh/github_actions_deploy -N "" -C "github-actions-deploy"
+   ```
+
+2. **Add Public Key to Server**:
+   ```bash
+   # Copy your public key
+   cat ~/.ssh/github_actions_deploy.pub
+
+   # SSH into your server and add the public key
+   ssh root@your-server-ip
+   mkdir -p ~/.ssh
+   chmod 700 ~/.ssh
+   echo "your-public-key-content" >> ~/.ssh/authorized_keys
+   chmod 600 ~/.ssh/authorized_keys
+   ```
+
+3. **Add Private Key to GitHub Secrets**:
+   - Go to your repository → Settings → Secrets and variables → Actions
+   - Click "New repository secret"
+   - Name: `SSH_PRIVATE_KEY`
+   - Value: Paste the entire content of your private key file (including BEGIN and END lines)
+   ```bash
+   cat ~/.ssh/github_actions_deploy
+   ```
+
+4. **Configure Other Secrets**:
+   - `SSH_HOST`: Your server IP address
+   - `SSH_USERNAME`: Your SSH username (usually 'root')
+   - `SSH_PORT`: SSH port (22)
 
 ### Enabling CodeQL
 
