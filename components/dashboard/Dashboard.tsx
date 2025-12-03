@@ -1,20 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAuth, useProject, useUI, useOrganization } from '@/lib/store';
-import Sidebar from './Sidebar';
+import { useAuth, useProject, useOrganization, useUI } from '@/lib/store';
 import ToolDashboard from '../tools/ToolDashboard';
+import ProjectSelector from '../project/ProjectSelector';
 import FMEABuilder from '../fmea/FMEABuilder';
-import AIPanel from '../ai/AIPanel';
-import Header from './Header';
-import OnboardingGuide from '../onboarding/OnboardingGuide';
 import { Project } from '@/types';
 
 export default function Dashboard() {
-  const { user, token } = useAuth();
+  const { token } = useAuth();
   const { currentProject, projects, setProjects, setCurrentProject } = useProject();
   const { currentOrganization } = useOrganization();
-  const { sidebarCollapsed } = useUI();
+  const { currentView, setCurrentView } = useUI();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -59,53 +56,64 @@ export default function Dashboard() {
 
   const handleProjectSelect = (project: Project) => {
     setCurrentProject(project);
+    setCurrentView('workspace');
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex items-center justify-center h-full p-8">
         <div className="text-center">
           <div className="spinner mb-4 mx-auto" />
-          <p className="text-gray-600">Loading your projects...</p>
+          <p className="text-gray-600 dark:text-slate-400">Loading your projects...</p>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <div className={`${sidebarCollapsed ? 'w-16' : 'w-80'} transition-all duration-300 flex-shrink-0`}>
-        <Sidebar />
-      </div>
+  // Determine what to show based on currentView and currentProject
+  const renderContent = () => {
+    // If a project is selected, always show workspace
+    if (currentProject) {
+      return <FMEABuilder project={currentProject} />;
+    }
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <Header />
-        
-        <main className="flex-1">
-          {/* Content Area - No longer constrained by AI panel */}
-          <div className="w-full" data-tour="main-content">
-            {!currentProject ? (
-              <div className="p-8">
-                <ToolDashboard
-                  projects={projects}
-                  onProjectSelect={handleProjectSelect}
-                  onRefresh={loadProjects}
-                />
-              </div>
-            ) : (
-              <FMEABuilder project={currentProject} />
-            )}
+    // No project selected - show based on currentView
+    switch (currentView) {
+      case 'projects':
+        return (
+          <div className="max-w-7xl mx-auto p-8">
+            <button
+              onClick={() => setCurrentView('tools')}
+              className="mb-6 text-sm text-accent hover:text-accent/80 dark:hover:text-accent/80 font-medium flex items-center space-x-1"
+            >
+              <span>←</span>
+              <span>Back to Tools</span>
+            </button>
+            <ProjectSelector
+              projects={projects}
+              onProjectSelect={handleProjectSelect}
+              onRefresh={loadProjects}
+            />
           </div>
-        </main>
-        
-        {/* Floating AI Chat Widget */}
-        <AIPanel />
-        
-        {/* Onboarding Guide */}
-        <OnboardingGuide />
-      </div>
+        );
+
+      case 'tools':
+      default:
+        return (
+          <div className="p-8">
+            <ToolDashboard
+              projects={projects}
+              onProjectSelect={handleProjectSelect}
+              onRefresh={loadProjects}
+            />
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="w-full" data-tour="main-content">
+      {renderContent()}
     </div>
   );
 }

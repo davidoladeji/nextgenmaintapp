@@ -1,72 +1,119 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/store';
+import { useAuth, usePlatformSettings } from '@/lib/store';
 import { isSuperAdmin } from '@/lib/permissions-client';
-import { ArrowLeft, Settings, Zap, Shield } from 'lucide-react';
+import {
+  Palette,
+  Zap,
+  Shield,
+  DollarSign,
+  Settings,
+} from 'lucide-react';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import toast from 'react-hot-toast';
+import BrandingTab from '@/components/admin/settings/BrandingTab';
+import FeaturesTab from '@/components/admin/settings/FeaturesTab';
+import PlansTab from '@/components/admin/settings/PlansTab';
+import SecurityTab from '@/components/admin/settings/SecurityTab';
+import SystemTab from '@/components/admin/settings/SystemTab';
+
+type Tab = 'branding' | 'features' | 'plans' | 'security' | 'system';
+
+const TABS: { id: Tab; label: string; icon: typeof Palette }[] = [
+  { id: 'branding', label: 'Branding', icon: Palette },
+  { id: 'features', label: 'Features', icon: Zap },
+  { id: 'plans', label: 'Plans', icon: DollarSign },
+  { id: 'security', label: 'Security', icon: Shield },
+  { id: 'system', label: 'System', icon: Settings },
+];
 
 export default function AdminSettingsPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { loadSettings } = usePlatformSettings();
+  const [activeTab, setActiveTab] = useState<Tab>('branding');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!user || !isSuperAdmin(user)) {
       toast.error('Superadmin access required');
       router.push('/');
+      return;
     }
-  }, [user]);
+
+    // Load platform settings
+    const initSettings = async () => {
+      try {
+        await loadSettings();
+      } catch (error) {
+        console.error('Failed to load settings:', error);
+        toast.error('Failed to load platform settings');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initSettings();
+  }, [user, loadSettings, router]);
 
   if (!user || !isSuperAdmin(user)) {
     return null;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center space-x-4">
-          <button
-            onClick={() => router.push('/admin')}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
-          </button>
-          <div>
-            <h1 className="text-xl font-semibold text-gray-900">Platform Settings</h1>
-            <p className="text-sm text-gray-600">Configure platform-wide features and limits</p>
-          </div>
-        </div>
-      </div>
+    <DashboardLayout>
+      <div className="max-w-7xl mx-auto p-6">
+        <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
+          {/* Tab Navigation */}
+          <div className="border-b border-gray-200 dark:border-slate-700">
+            <nav className="flex -mb-px">
+              {TABS.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
 
-      <div className="max-w-6xl mx-auto p-8">
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-12 text-center">
-          <div className="w-20 h-20 bg-gradient-to-br from-monday-purple to-monday-softPurple rounded-full flex items-center justify-center mx-auto mb-6">
-            <Settings className="w-10 h-10 text-white" />
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`group relative px-6 py-4 text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'text-blue-600 dark:text-blue-400'
+                        : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <Icon className="w-4 h-4" />
+                      <span>{tab.label}</span>
+                    </div>
+                    {isActive && (
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400" />
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">Platform Configuration Coming Soon</h2>
-          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Configure feature flags, plan limits, default settings, and platform-wide configurations.
-            This advanced admin feature is planned for Phase 1 development.
-          </p>
-          <div className="space-y-4 max-w-md mx-auto text-left">
-            <div className="flex items-start space-x-3 p-4 bg-monday-lightPurple rounded-lg">
-              <Zap className="w-5 h-5 text-monday-purple flex-shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-semibold text-gray-900 text-sm">Feature Flags</h3>
-                <p className="text-xs text-gray-600 mt-1">Enable/disable features per plan tier</p>
+
+          {/* Tab Content */}
+          <div className="p-6">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="spinner" />
               </div>
-            </div>
-            <div className="flex items-start space-x-3 p-4 bg-monday-lightPurple rounded-lg">
-              <Shield className="w-5 h-5 text-monday-purple flex-shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-semibold text-gray-900 text-sm">Plan Configuration</h3>
-                <p className="text-xs text-gray-600 mt-1">Set max users, projects, and storage per plan</p>
-              </div>
-            </div>
+            ) : (
+              <>
+                {activeTab === 'branding' && <BrandingTab />}
+                {activeTab === 'features' && <FeaturesTab />}
+                {activeTab === 'plans' && <PlansTab />}
+                {activeTab === 'security' && <SecurityTab />}
+                {activeTab === 'system' && <SystemTab />}
+              </>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

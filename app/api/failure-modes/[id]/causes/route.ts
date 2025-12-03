@@ -1,3 +1,4 @@
+import { FailureMode, Cause, Effect, Control } from "@/types";
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import { readDatabase, writeDatabase } from '@/lib/database-simple';
@@ -21,7 +22,7 @@ export async function POST(
     const db = readDatabase();
     
     // Verify failure mode exists
-    const failureMode = db.failureModes.find(fm => fm.id === failureModeId);
+    const failureMode = db.failureModes.find((fm: FailureMode) => fm.id === failureModeId);
     if (!failureMode) {
       return NextResponse.json(
         { success: false, error: 'Failure mode not found' },

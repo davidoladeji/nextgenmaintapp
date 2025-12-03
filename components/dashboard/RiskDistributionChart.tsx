@@ -7,6 +7,7 @@ interface RiskDistributionChartProps {
   type: 'severity' | 'occurrence' | 'detection';
   failureModes: FailureMode[];
   title: string;
+  inline?: boolean;
 }
 
 const COLORS = {
@@ -15,7 +16,7 @@ const COLORS = {
   'High (8-10)': '#ef4444'     // Red
 };
 
-export default function RiskDistributionChart({ type, failureModes, title }: RiskDistributionChartProps) {
+export default function RiskDistributionChart({ type, failureModes, title, inline = false }: RiskDistributionChartProps) {
   // Extract values based on type
   const extractValues = (): number[] => {
     const values: number[] = [];
@@ -49,13 +50,21 @@ export default function RiskDistributionChart({ type, failureModes, title }: Ris
   ].filter(item => item.count > 0);
 
   if (chartData.length === 0) {
-    return (
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
+    const content = (
+      <>
         <h3 className="text-base font-semibold text-gray-900 dark:text-slate-100 mb-1">{title}</h3>
         <p className="text-xs text-gray-600 dark:text-slate-400 mb-4">Distribution</p>
         <div className="flex items-center justify-center h-48 text-gray-500 dark:text-slate-400 text-sm">
           No data available
         </div>
+      </>
+    );
+
+    return inline ? (
+      <div>{content}</div>
+    ) : (
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
+        {content}
       </div>
     );
   }
@@ -95,24 +104,25 @@ export default function RiskDistributionChart({ type, failureModes, title }: Ris
     );
   };
 
-  return (
-    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
+  // Chart content (shared between inline and standalone modes)
+  const chartContent = (
+    <>
       <div className="mb-2">
         <h3 className="text-base font-semibold text-gray-900 dark:text-slate-100">{title}</h3>
         <p className="text-xs text-gray-600 dark:text-slate-400">Distribution</p>
       </div>
 
-      <div className="h-72 relative">
+      <div className="h-64 relative">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={chartData}
               cx="50%"
-              cy="45%"
+              cy="50%"
               labelLine={false}
               label={renderCustomLabel}
-              innerRadius={60}
-              outerRadius={105}
+              innerRadius={50}
+              outerRadius={85}
               fill="#8884d8"
               dataKey="count"
             >
@@ -125,7 +135,7 @@ export default function RiskDistributionChart({ type, failureModes, title }: Ris
         </ResponsiveContainer>
 
         {/* Center Text */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none" style={{ marginTop: '-5%' }}>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
           <div className="text-2xl font-bold text-gray-900 dark:text-slate-100">{totalCount}</div>
           <div className="text-xs text-gray-600 dark:text-slate-400">Total</div>
         </div>
@@ -146,6 +156,14 @@ export default function RiskDistributionChart({ type, failureModes, title }: Ris
           </div>
         ))}
       </div>
+    </>
+  );
+
+  return inline ? (
+    <div className="flex flex-col">{chartContent}</div>
+  ) : (
+    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4">
+      {chartContent}
     </div>
   );
 }

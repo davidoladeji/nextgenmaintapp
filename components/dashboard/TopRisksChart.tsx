@@ -1,6 +1,6 @@
 'use client';
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { ChartData } from '@/types';
 
 interface TopRisksChartProps {
@@ -11,9 +11,9 @@ interface TopRisksChartProps {
 export default function TopRisksChart({ data, onBarClick }: TopRisksChartProps) {
   if (data.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Risk Failure Modes</h3>
-        <div className="flex items-center justify-center h-64 text-gray-500">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Top Risk Failure Modes</h3>
+        <div className="flex items-center justify-center h-64 text-gray-500 dark:text-slate-400">
           No failure modes with calculated risk levels
         </div>
       </div>
@@ -24,13 +24,13 @@ export default function TopRisksChart({ data, onBarClick }: TopRisksChartProps) 
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900 mb-2">{label}</p>
+        <div className="bg-white dark:bg-slate-800 p-4 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg">
+          <p className="font-medium text-gray-900 dark:text-slate-100 mb-2">{label}</p>
           <div className="space-y-1">
-            <p className="text-sm text-gray-600">RPN: <span className="font-medium">{data.rpn}</span></p>
-            <p className="text-sm text-gray-600">Severity: <span className="font-medium">{data.severity}</span></p>
-            <p className="text-sm text-gray-600">Occurrence: <span className="font-medium">{data.occurrence}</span></p>
-            <p className="text-sm text-gray-600">Detection: <span className="font-medium">{data.detection}</span></p>
+            <p className="text-sm text-gray-600 dark:text-slate-400">RPN: <span className="font-medium">{data.rpn}</span></p>
+            <p className="text-sm text-gray-600 dark:text-slate-400">Severity: <span className="font-medium">{data.severity}</span></p>
+            <p className="text-sm text-gray-600 dark:text-slate-400">Occurrence: <span className="font-medium">{data.occurrence}</span></p>
+            <p className="text-sm text-gray-600 dark:text-slate-400">Detection: <span className="font-medium">{data.detection}</span></p>
           </div>
         </div>
       );
@@ -46,9 +46,9 @@ export default function TopRisksChart({ data, onBarClick }: TopRisksChartProps) 
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Risk Failure Modes</h3>
-      <div className="h-80">
+    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Top Risk Failure Modes</h3>
+      <div className="h-96">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
@@ -56,30 +56,37 @@ export default function TopRisksChart({ data, onBarClick }: TopRisksChartProps) 
               top: 20,
               right: 30,
               left: 20,
-              bottom: 60,
+              bottom: 80,
             }}
+            barCategoryGap="20%"
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-            <XAxis 
-              dataKey="failureMode" 
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-slate-700" />
+            <XAxis
+              dataKey="failureMode"
               angle={-45}
               textAnchor="end"
               height={100}
-              fontSize={12}
+              tick={{ fontSize: 11 }}
               stroke="#6b7280"
+              className="dark:stroke-slate-400"
             />
-            <YAxis 
+            <YAxis
               stroke="#6b7280"
-              fontSize={12}
+              className="dark:stroke-slate-400"
+              tick={{ fontSize: 12 }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Bar
               dataKey="rpn"
-              fill={(entry: any) => getBarColor(entry.rpn)}
+              fill="#6366f1"
               radius={[4, 4, 0, 0]}
               onClick={(data: any) => onBarClick?.(data.failureModeId)}
               cursor="pointer"
-            />
+            >
+              {data.map((entry: any, index: number) => (
+                <Cell key={`cell-${index}`} fill={getBarColor(entry.rpn)} />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>

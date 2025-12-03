@@ -7,7 +7,6 @@ import toast from 'react-hot-toast';
 import { useAuth } from '@/lib/store';
 import AISuggestionModal from '../ai/AISuggestionModal';
 import AIInputField from '../common/AIInputField';
-import DynamicContextToolbar from './DynamicContextToolbar';
 
 interface FailureModeCardProps {
   failureMode: FailureMode;
@@ -68,7 +67,7 @@ export default function FailureModeCard({
 
   // Calculate RPN for display
   const calculateRPN = () => {
-    if (failureMode.causes.length === 0 || failureMode.effects.length === 0) {
+    if (!failureMode.causes?.length || !failureMode.effects?.length) {
       return { rpn: 0, severity: 0, occurrence: 0, detection: 10 };
     }
 
@@ -77,10 +76,10 @@ export default function FailureModeCard({
     let maxOccurrence = 0;
     let maxDetection = 10;
 
-    for (const cause of failureMode.causes) {
-      for (const effect of failureMode.effects) {
-        const detectionScore = failureMode.controls.length > 0 
-          ? Math.min(...failureMode.controls.map(c => c.detection))
+    for (const cause of failureMode.causes || []) {
+      for (const effect of failureMode.effects || []) {
+        const detectionScore = (failureMode.controls?.length || 0) > 0
+          ? Math.min(...(failureMode.controls || []).map((c: any) => c.detection))
           : 10;
         
         const rpn = effect.severity * cause.occurrence * detectionScore;
@@ -181,7 +180,7 @@ export default function FailureModeCard({
         const result = await response.json();
         const updatedFailureMode = {
           ...failureMode,
-          causes: failureMode.causes.map(c => c.id === causeId ? result.data : c),
+          causes: (failureMode.causes || []).map(c => c.id === causeId ? result.data : c),
         };
         onUpdate(updatedFailureMode);
         setEditingCauseId(null);
@@ -207,7 +206,7 @@ export default function FailureModeCard({
       if (response.ok) {
         const updatedFailureMode = {
           ...failureMode,
-          causes: failureMode.causes.filter(c => c.id !== causeId),
+          causes: (failureMode.causes || []).filter(c => c.id !== causeId),
         };
         onUpdate(updatedFailureMode);
         setSelectedCauseId(null);
@@ -221,7 +220,7 @@ export default function FailureModeCard({
   };
 
   const handleDuplicateCause = async (causeId: string) => {
-    const cause = failureMode.causes.find(c => c.id === causeId);
+    const cause = (failureMode.causes || []).find(c => c.id === causeId);
     if (!cause) return;
 
     try {
@@ -241,7 +240,7 @@ export default function FailureModeCard({
         const result = await response.json();
         const updatedFailureMode = {
           ...failureMode,
-          causes: [...failureMode.causes, result.data],
+          causes: [...(failureMode.causes || []), result.data],
         };
         onUpdate(updatedFailureMode);
         setSelectedCauseId(null);
@@ -303,7 +302,7 @@ export default function FailureModeCard({
         const result = await response.json();
         const updatedFailureMode = {
           ...failureMode,
-          effects: failureMode.effects.map(e => e.id === effectId ? result.data : e),
+          effects: (failureMode.effects || []).map(e => e.id === effectId ? result.data : e),
         };
         onUpdate(updatedFailureMode);
         setEditingEffectId(null);
@@ -325,7 +324,7 @@ export default function FailureModeCard({
       if (response.ok) {
         const updatedFailureMode = {
           ...failureMode,
-          effects: failureMode.effects.filter(e => e.id !== effectId),
+          effects: (failureMode.effects || []).filter(e => e.id !== effectId),
         };
         onUpdate(updatedFailureMode);
         setSelectedEffectId(null);
@@ -337,7 +336,7 @@ export default function FailureModeCard({
   };
 
   const handleDuplicateEffect = async (effectId: string) => {
-    const effect = failureMode.effects.find(e => e.id === effectId);
+    const effect = (failureMode.effects || []).find(e => e.id === effectId);
     if (!effect) return;
     try {
       const response = await fetch(`/api/failure-modes/${failureMode.id}/effects`, {
@@ -355,7 +354,7 @@ export default function FailureModeCard({
         const result = await response.json();
         const updatedFailureMode = {
           ...failureMode,
-          effects: [...failureMode.effects, result.data],
+          effects: [...(failureMode.effects || []), result.data],
         };
         onUpdate(updatedFailureMode);
         setSelectedEffectId(null);
@@ -415,7 +414,7 @@ export default function FailureModeCard({
         const result = await response.json();
         const updatedFailureMode = {
           ...failureMode,
-          controls: failureMode.controls.map(c => c.id === controlId ? result.data : c),
+          controls: (failureMode.controls || []).map(c => c.id === controlId ? result.data : c),
         };
         onUpdate(updatedFailureMode);
         setEditingControlId(null);
@@ -437,7 +436,7 @@ export default function FailureModeCard({
       if (response.ok) {
         const updatedFailureMode = {
           ...failureMode,
-          controls: failureMode.controls.filter(c => c.id !== controlId),
+          controls: (failureMode.controls || []).filter(c => c.id !== controlId),
         };
         onUpdate(updatedFailureMode);
         setSelectedControlId(null);
@@ -449,7 +448,7 @@ export default function FailureModeCard({
   };
 
   const handleDuplicateControl = async (controlId: string) => {
-    const control = failureMode.controls.find(c => c.id === controlId);
+    const control = (failureMode.controls || []).find(c => c.id === controlId);
     if (!control) return;
     try {
       const response = await fetch(`/api/failure-modes/${failureMode.id}/controls`, {
@@ -469,7 +468,7 @@ export default function FailureModeCard({
         const result = await response.json();
         const updatedFailureMode = {
           ...failureMode,
-          controls: [...failureMode.controls, result.data],
+          controls: [...(failureMode.controls || []), result.data],
         };
         onUpdate(updatedFailureMode);
         setSelectedControlId(null);
@@ -529,7 +528,7 @@ export default function FailureModeCard({
         const result = await response.json();
         const updatedFailureMode = {
           ...failureMode,
-          actions: failureMode.actions.map(a => a.id === actionId ? result.data : a),
+          actions: (failureMode.actions || []).map(a => a.id === actionId ? result.data : a),
         };
         onUpdate(updatedFailureMode);
         setEditingActionId(null);
@@ -551,7 +550,7 @@ export default function FailureModeCard({
       if (response.ok) {
         const updatedFailureMode = {
           ...failureMode,
-          actions: failureMode.actions.filter(a => a.id !== actionId),
+          actions: (failureMode.actions || []).filter(a => a.id !== actionId),
         };
         onUpdate(updatedFailureMode);
         setSelectedActionId(null);
@@ -563,7 +562,7 @@ export default function FailureModeCard({
   };
 
   const handleDuplicateAction = async (actionId: string) => {
-    const action = failureMode.actions.find(a => a.id === actionId);
+    const action = (failureMode.actions || []).find(a => a.id === actionId);
     if (!action) return;
     try {
       const response = await fetch(`/api/failure-modes/${failureMode.id}/actions`, {
@@ -583,7 +582,7 @@ export default function FailureModeCard({
         const result = await response.json();
         const updatedFailureMode = {
           ...failureMode,
-          actions: [...failureMode.actions, result.data],
+          actions: [...(failureMode.actions || []), result.data],
         };
         onUpdate(updatedFailureMode);
         setSelectedActionId(null);
@@ -746,8 +745,18 @@ export default function FailureModeCard({
       toast.success(`Added ${selectedSuggestions.length} causes`);
       setShowAISuggestCauses(false);
 
-      // Refresh data (call parent callback or refetch)
-      window.location.reload();
+      // Fetch updated failure mode data
+      try {
+        const response = await fetch(`/api/failure-modes/${failureMode.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const result = await response.json();
+        if (result.success) {
+          onUpdate(result.data);
+        }
+      } catch (error) {
+        console.error('Error fetching updated data:', error);
+      }
     } catch (error) {
       console.error('Error creating causes:', error);
       toast.error('Failed to create causes');
@@ -773,7 +782,19 @@ export default function FailureModeCard({
       await Promise.all(createPromises);
       toast.success(`Added ${selectedSuggestions.length} effects`);
       setShowAISuggestEffects(false);
-      window.location.reload();
+
+      // Fetch updated failure mode data
+      try {
+        const response = await fetch(`/api/failure-modes/${failureMode.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const result = await response.json();
+        if (result.success) {
+          onUpdate(result.data);
+        }
+      } catch (error) {
+        console.error('Error fetching updated data:', error);
+      }
     } catch (error) {
       console.error('Error creating effects:', error);
       toast.error('Failed to create effects');
@@ -801,7 +822,19 @@ export default function FailureModeCard({
       await Promise.all(createPromises);
       toast.success(`Added ${selectedSuggestions.length} controls`);
       setShowAISuggestControls(false);
-      window.location.reload();
+
+      // Fetch updated failure mode data
+      try {
+        const response = await fetch(`/api/failure-modes/${failureMode.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const result = await response.json();
+        if (result.success) {
+          onUpdate(result.data);
+        }
+      } catch (error) {
+        console.error('Error fetching updated data:', error);
+      }
     } catch (error) {
       console.error('Error creating controls:', error);
       toast.error('Failed to create controls');
@@ -865,7 +898,7 @@ export default function FailureModeCard({
                   onChange={(value) => setEditData({...editData, processStep: value})}
                   type="text"
                   className="text-sm"
-                  token={token}
+                  token={token || undefined}
                   aiContext={{
                     type: 'processStep',
                     asset: project.asset,
@@ -887,7 +920,7 @@ export default function FailureModeCard({
                   type="textarea"
                   className="text-sm min-h-[60px]"
                   rows={3}
-                  token={token}
+                  token={token || undefined}
                   aiContext={{
                     type: 'failureMode',
                     asset: project.asset,
@@ -994,7 +1027,7 @@ export default function FailureModeCard({
           </div>
           
           <div className="space-y-2">
-            {failureMode.causes.map((cause) => {
+            {(failureMode.causes || []).map((cause) => {
               const isSelected = selectedCauseId === cause.id;
               const isEditMode = editingCauseId === cause.id;
 
@@ -1014,7 +1047,7 @@ export default function FailureModeCard({
                           className="text-sm min-h-[60px] text-gray-900"
                           placeholder="Describe the potential cause..."
                           rows={3}
-                          token={token}
+                          token={token || undefined}
                           aiContext={{
                             type: 'cause',
                             asset: project.asset,
@@ -1084,7 +1117,7 @@ export default function FailureModeCard({
               );
             })}
             
-            {failureMode.causes.length === 0 && (
+            {(failureMode.causes || []).length === 0 && (
               <p className="text-sm text-gray-500 italic">No causes defined</p>
             )}
 
@@ -1103,7 +1136,7 @@ export default function FailureModeCard({
                       className="text-sm min-h-[60px] text-gray-900"
                       placeholder="Describe the potential cause..."
                       rows={3}
-                      token={token}
+                      token={token || undefined}
                       aiContext={{
                         type: 'cause',
                         asset: project.asset,
@@ -1148,35 +1181,13 @@ export default function FailureModeCard({
             )}
           </div>
 
-          {/* Dynamic Context Toolbar for Causes */}
-          {selectedCauseId && !editingCauseId && (
-            <DynamicContextToolbar
-              type="cause"
-              onEdit={() => {
-                const cause = failureMode.causes.find(c => c.id === selectedCauseId);
-                if (cause) {
-                  setEditCauseData({
-                    description: cause.description,
-                    occurrence: cause.occurrence,
-                  });
-                  setEditingCauseId(selectedCauseId);
-                }
-              }}
-              onDuplicate={() => handleDuplicateCause(selectedCauseId)}
-              onDelete={() => handleDeleteCause(selectedCauseId)}
-              onAISuggest={() => {
-                // TODO: Implement AI suggest for existing cause
-                toast.info('AI suggestions for existing items coming soon');
-              }}
-            />
-          )}
         </div>
 
         {/* Effects */}
         <div>
           <div className="flex items-center justify-between mb-3">
             <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
-              Effects ({failureMode.effects.length})
+              Effects ({(failureMode.effects || []).length})
             </h4>
             <div className="flex gap-2">
               <button
@@ -1197,7 +1208,7 @@ export default function FailureModeCard({
           </div>
           
           <div className="space-y-2">
-            {failureMode.effects.map((effect) => {
+            {(failureMode.effects || []).map((effect) => {
               const isSelected = selectedEffectId === effect.id;
               const isEditMode = editingEffectId === effect.id;
 
@@ -1216,7 +1227,7 @@ export default function FailureModeCard({
                           className="text-sm min-h-[60px] text-gray-900"
                           placeholder="Describe the potential effect..."
                           rows={3}
-                          token={token}
+                          token={token || undefined}
                           aiContext={{
                             type: 'effect',
                             asset: project.asset,
@@ -1285,7 +1296,7 @@ export default function FailureModeCard({
               );
             })}
             
-            {failureMode.effects.length === 0 && (
+            {(failureMode.effects || []).length === 0 && (
               <p className="text-sm text-gray-500 italic">No effects defined</p>
             )}
 
@@ -1304,7 +1315,7 @@ export default function FailureModeCard({
                       className="text-sm min-h-[60px] text-gray-900"
                       placeholder="Describe the potential effect..."
                       rows={3}
-                      token={token}
+                      token={token || undefined}
                       aiContext={{
                         type: 'effect',
                         asset: project.asset,
@@ -1348,35 +1359,13 @@ export default function FailureModeCard({
               </div>
             )}
           </div>
-
-          {/* Dynamic Context Toolbar for Effects */}
-          {selectedEffectId && !editingEffectId && (
-            <DynamicContextToolbar
-              type="effect"
-              onEdit={() => {
-                const effect = failureMode.effects.find(e => e.id === selectedEffectId);
-                if (effect) {
-                  setEditEffectData({
-                    description: effect.description,
-                    severity: effect.severity,
-                  });
-                  setEditingEffectId(selectedEffectId);
-                }
-              }}
-              onDuplicate={() => handleDuplicateEffect(selectedEffectId)}
-              onDelete={() => handleDeleteEffect(selectedEffectId)}
-              onAISuggest={() => {
-                toast.info('AI suggestions for existing items coming soon');
-              }}
-            />
-          )}
         </div>
 
         {/* Controls */}
         <div>
           <div className="flex items-center justify-between mb-3">
             <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
-              Controls ({failureMode.controls.length})
+              Controls ({(failureMode.controls || []).length})
             </h4>
             <div className="flex gap-2">
               <button
@@ -1397,7 +1386,7 @@ export default function FailureModeCard({
           </div>
           
           <div className="space-y-2">
-            {failureMode.controls.map((control) => {
+            {(failureMode.controls || []).map((control) => {
               const isSelected = selectedControlId === control.id;
               const isEditMode = editingControlId === control.id;
 
@@ -1429,7 +1418,7 @@ export default function FailureModeCard({
                           className="text-sm min-h-[60px] text-gray-900"
                           placeholder="Describe the control measure..."
                           rows={3}
-                          token={token}
+                          token={token || undefined}
                           aiContext={{
                             type: 'control',
                             asset: project.asset,
@@ -1525,7 +1514,7 @@ export default function FailureModeCard({
               );
             })}
             
-            {failureMode.controls.length === 0 && (
+            {(failureMode.controls || []).length === 0 && (
               <p className="text-sm text-gray-500 italic">No controls defined</p>
             )}
 
@@ -1557,7 +1546,7 @@ export default function FailureModeCard({
                       className="text-sm min-h-[60px] text-gray-900"
                       placeholder="Describe the control measure..."
                       rows={3}
-                      token={token}
+                      token={token || undefined}
                       aiContext={{
                         type: 'control',
                         asset: project.asset,
@@ -1617,37 +1606,13 @@ export default function FailureModeCard({
               </div>
             )}
           </div>
-
-          {/* Dynamic Context Toolbar for Controls */}
-          {selectedControlId && !editingControlId && (
-            <DynamicContextToolbar
-              type="control"
-              onEdit={() => {
-                const control = failureMode.controls.find(c => c.id === selectedControlId);
-                if (control) {
-                  setEditControlData({
-                    type: control.type,
-                    description: control.description,
-                    detection: control.detection,
-                    effectiveness: control.effectiveness,
-                  });
-                  setEditingControlId(selectedControlId);
-                }
-              }}
-              onDuplicate={() => handleDuplicateControl(selectedControlId)}
-              onDelete={() => handleDeleteControl(selectedControlId)}
-              onAISuggest={() => {
-                toast.info('AI suggestions for existing items coming soon');
-              }}
-            />
-          )}
         </div>
 
         {/* Actions */}
         <div>
           <div className="flex items-center justify-between mb-3">
             <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
-              Actions ({failureMode.actions.length})
+              Actions ({(failureMode.actions || []).length})
             </h4>
             <button 
               onClick={() => setShowAddAction(true)}
@@ -1659,7 +1624,7 @@ export default function FailureModeCard({
           </div>
           
           <div className="space-y-2">
-            {failureMode.actions.map((action) => {
+            {(failureMode.actions || []).map((action) => {
               const isSelected = selectedActionId === action.id;
               const isEditMode = editingActionId === action.id;
 
@@ -1678,7 +1643,7 @@ export default function FailureModeCard({
                           className="text-sm min-h-[60px] text-gray-900"
                           placeholder="Describe the action..."
                           rows={3}
-                          token={token}
+                          token={token || undefined}
                           aiContext={{
                             type: 'action',
                             asset: project.asset,
@@ -1790,7 +1755,7 @@ export default function FailureModeCard({
               );
             })}
 
-            {failureMode.actions.length === 0 && (
+            {(failureMode.actions || []).length === 0 && (
               <p className="text-sm text-gray-500 italic">No actions defined</p>
             )}
 
@@ -1809,7 +1774,7 @@ export default function FailureModeCard({
                       className="text-sm min-h-[60px] text-gray-900"
                       placeholder="Describe the corrective action..."
                       rows={3}
-                      token={token}
+                      token={token || undefined}
                       aiContext={{
                         type: 'action',
                         asset: project.asset,
@@ -1831,7 +1796,7 @@ export default function FailureModeCard({
                         type="text"
                         className="text-sm text-gray-900"
                         placeholder="Responsible person..."
-                        token={token}
+                        token={token || undefined}
                         aiContext={{
                           type: 'action',
                           asset: project.asset,
@@ -1888,30 +1853,6 @@ export default function FailureModeCard({
               </div>
             )}
           </div>
-
-          {/* Dynamic Context Toolbar for Actions */}
-          {selectedActionId && !editingActionId && (
-            <DynamicContextToolbar
-              type="action"
-              onEdit={() => {
-                const action = failureMode.actions.find(a => a.id === selectedActionId);
-                if (action) {
-                  setEditActionData({
-                    description: action.description,
-                    owner: action.owner,
-                    dueDate: action.dueDate,
-                    status: action.status,
-                  });
-                  setEditingActionId(selectedActionId);
-                }
-              }}
-              onDuplicate={() => handleDuplicateAction(selectedActionId)}
-              onDelete={() => handleDeleteAction(selectedActionId)}
-              onAISuggest={() => {
-                toast.info('AI suggestions for existing items coming soon');
-              }}
-            />
-          )}
         </div>
 
         {/* Metadata */}

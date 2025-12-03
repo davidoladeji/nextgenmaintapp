@@ -3,53 +3,144 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  /* Light mode variables */
+  --bg-primary: 249 250 251; /* gray-50 */
+  --bg-secondary: 255 255 255; /* white */
+  --bg-tertiary: 243 244 246; /* gray-100 */
+  --text-primary: 17 24 39; /* gray-900 */
+  --text-secondary: 75 85 99; /* gray-600 */
+  --text-tertiary: 156 163 175; /* gray-400 */
+  --border-primary: 229 231 235; /* gray-200 */
+  --border-secondary: 209 213 219; /* gray-300 */
+
+  /* Accent color - Customizable via Admin Settings */
+  --accent-light: 59 130 246; /* blue-600 - Default, overridden by platform settings */
+  --accent-primary: var(--accent-light);
+  --accent-hover-light: 37 99 235; /* blue-700 - Default, overridden by platform settings */
+  --accent-hover: var(--accent-hover-light);
+
+  /* Shadcn/ui CSS variables */
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 250 100% 69%; /* #6161FF */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 100% 61%; /* #FF3838 */
+  --destructive-foreground: 0 0% 100%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 250 100% 69%;
+  --radius: 0.5rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+.dark {
+  /* Dark mode variables - Jony Ive inspired */
+  --bg-primary: 15 23 42; /* slate-900 */
+  --bg-secondary: 30 41 59; /* slate-800 */
+  --bg-tertiary: 51 65 85; /* slate-700 */
+  --text-primary: 241 245 249; /* slate-100 */
+  --text-secondary: 148 163 184; /* slate-400 */
+  --text-tertiary: 100 116 139; /* slate-500 */
+  --border-primary: 51 65 85; /* slate-700 */
+  --border-secondary: 71 85 105; /* slate-600 */
+
+  /* Accent color - Customizable via Admin Settings */
+  --accent-dark: 96 165 250; /* blue-400 - Default, overridden by platform settings */
+  --accent-primary: var(--accent-dark);
+  --accent-hover-dark: 59 130 246; /* blue-500 - Default, overridden by platform settings */
+  --accent-hover: var(--accent-hover-dark);
+
+  /* Shadcn/ui dark mode */
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 42 100% 50%; /* Amber #f59e0b */
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 42 100% 50%;
+}
+
+* {
+  transition: background-color 200ms ease-out, border-color 200ms ease-out, color 200ms ease-out;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  @apply bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-slate-100;
 }
 
 @layer base {
   * {
-    @apply border-gray-200;
-  }
-  body {
-    @apply bg-gray-50 text-gray-900;
+    @apply border-gray-200 dark:border-slate-700;
   }
 }
 
 @layer components {
+  /* Accent Color Utility Classes */
+  .bg-accent {
+    background-color: rgb(var(--accent-primary));
+  }
+
+  .text-accent {
+    color: rgb(var(--accent-primary));
+  }
+
+  .border-accent {
+    border-color: rgb(var(--accent-primary));
+  }
+
+  .hover\:bg-accent:hover {
+    background-color: rgb(var(--accent-primary));
+  }
+
+  .hover\:text-accent:hover {
+    color: rgb(var(--accent-primary));
+  }
+
+  .focus\:ring-accent:focus {
+    --tw-ring-color: rgb(var(--accent-primary));
+  }
+
   .btn {
-    @apply inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-white transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-monday-purple focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-white transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50;
+    --tw-ring-color: rgb(var(--accent-primary));
   }
 
   .btn-primary {
-    @apply btn bg-gradient-to-r from-monday-purple to-monday-softPurple text-white hover:shadow-lg hover:scale-105 active:scale-95;
+    @apply btn text-white hover:shadow-lg hover:scale-105 active:scale-95;
+    background-color: rgb(var(--accent-primary));
+  }
+
+  .btn-primary:hover {
+    background-color: rgb(var(--accent-hover));
   }
 
   .btn-secondary {
-    @apply btn bg-gray-100 text-gray-900 hover:bg-gray-200 border border-gray-300;
+    @apply btn bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-slate-100 hover:bg-gray-200 dark:hover:bg-slate-600 border border-gray-300 dark:border-slate-600;
   }
 
   .btn-danger {
-    @apply btn bg-gradient-to-r from-status-critical to-red-500 text-white hover:shadow-lg hover:scale-105 active:scale-95;
+    @apply btn bg-red-600 dark:bg-red-500 text-white hover:bg-red-700 dark:hover:bg-red-600 hover:shadow-lg hover:scale-105 active:scale-95;
   }
   
   .btn-sm {
@@ -65,10 +156,10 @@ body {
   }
   
   .input {
-    @apply flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply flex w-full rounded-md border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-gray-900 dark:text-slate-100 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 dark:placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
   }
 
-  /* Fix browser autofill text color */
+  /* Fix browser autofill text color - Light mode */
   .input:-webkit-autofill,
   .input:-webkit-autofill:hover,
   .input:-webkit-autofill:focus,
@@ -78,32 +169,30 @@ body {
     transition: background-color 5000s ease-in-out 0s;
   }
 
-  /* Force dark text on all input elements */
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="number"],
-  input[type="url"],
-  textarea,
-  select {
-    color: #111827 !important;
+  /* Fix browser autofill text color - Dark mode */
+  .dark .input:-webkit-autofill,
+  .dark .input:-webkit-autofill:hover,
+  .dark .input:-webkit-autofill:focus,
+  .dark .input:-webkit-autofill:active {
+    -webkit-text-fill-color: #f1f5f9 !important;
+    -webkit-box-shadow: 0 0 0 30px #1e293b inset !important;
   }
   
   .card {
-    @apply rounded-lg border bg-white p-6 shadow-sm hover:shadow-md transition-shadow duration-200;
+    @apply rounded-lg border bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 p-6 shadow-sm hover:shadow-md transition-shadow duration-200;
   }
 
-  /* Monday.com-style gradient cards */
+  /* Solid color card variants */
   .card-purple {
-    @apply card bg-gradient-to-br from-monday-lightPurple to-white border-monday-purple/20;
+    @apply card bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800;
   }
 
   .card-pink {
-    @apply card bg-gradient-to-br from-pink-50 to-white border-monday-pink/20;
+    @apply card bg-pink-50 dark:bg-pink-900/20 border-pink-200 dark:border-pink-800;
   }
 
   .card-teal {
-    @apply card bg-gradient-to-br from-teal-50 to-white border-monday-teal/20;
+    @apply card bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-800;
   }
   
   .tooltip {
@@ -137,16 +226,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  @apply bg-gray-100 dark:bg-slate-800;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  @apply bg-gray-300 dark:bg-slate-600;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  @apply bg-gray-400 dark:bg-slate-500;
 }
 
 /* Loading spinner */
@@ -164,21 +253,21 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-/* Risk priority colors - Monday.com style */
+/* Risk priority colors - Solid style */
 .risk-low {
-  @apply bg-gradient-to-r from-green-100 to-success-50 text-success-700 border border-success-200;
+  @apply bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800;
 }
 
 .risk-medium {
-  @apply bg-gradient-to-r from-yellow-100 to-warning-50 text-warning-700 border border-warning-200;
+  @apply bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800;
 }
 
 .risk-high {
-  @apply bg-gradient-to-r from-orange-100 to-red-50 text-status-high border border-orange-200;
+  @apply bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800;
 }
 
 .risk-critical {
-  @apply bg-gradient-to-r from-red-100 to-red-200 text-status-critical border border-red-300 font-bold;
+  @apply bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 font-bold;
 }
 
 /* Fade animations */
@@ -234,4 +323,44 @@ body {
 
 .animate-fadeIn {
   animation: fadeIn 0.2s ease-out;
+}
+
+/* Custom react-colorful styling */
+.react-colorful {
+  width: 100% !important;
+  height: 200px;
+}
+
+.react-colorful__saturation {
+  border-radius: 8px 8px 0 0;
+  border-bottom: none;
+}
+
+.react-colorful__hue {
+  height: 32px;
+  border-radius: 0 0 8px 8px;
+  margin-top: 12px;
+}
+
+.react-colorful__pointer {
+  width: 24px;
+  height: 24px;
+  border-width: 3px;
+  border-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.react-colorful__pointer:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Dark mode adjustments */
+.dark .react-colorful__pointer {
+  border-color: rgba(241, 245, 249, 0.9);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.dark .react-colorful__pointer:focus {
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.5), 0 2px 8px rgba(0, 0, 0, 0.6);
 }

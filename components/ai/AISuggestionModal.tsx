@@ -63,19 +63,19 @@ export default function AISuggestionModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center p-4 z-50">
+      <div className="bg-white dark:bg-slate-800 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-slate-700">
           <div className="flex items-center">
-            <Sparkles className="w-6 h-6 text-purple-600 mr-2" />
-            <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
+            <Sparkles className="w-6 h-6 text-accent mr-2" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100">{title}</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-gray-500 dark:text-slate-400" />
           </button>
         </div>
 
@@ -84,32 +84,32 @@ export default function AISuggestionModal({
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
-                <div className="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                <p className="text-gray-600">AI is generating suggestions...</p>
+                <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-gray-600 dark:text-slate-300">AI is generating suggestions...</p>
               </div>
             </div>
           ) : suggestions.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-600">No suggestions available.</p>
+              <p className="text-gray-600 dark:text-slate-300">No suggestions available.</p>
             </div>
           ) : (
             <>
               {/* Selection Controls */}
               <div className="flex items-center justify-between mb-4">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-slate-400">
                   {selectedIndexes.size} of {suggestions.length} selected
                 </p>
                 <div className="flex gap-2">
                   <button
                     onClick={handleSelectAll}
-                    className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                    className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
                   >
                     Select All
                   </button>
-                  <span className="text-gray-300">|</span>
+                  <span className="text-gray-300 dark:text-slate-600">|</span>
                   <button
                     onClick={handleDeselectAll}
-                    className="text-sm text-gray-600 hover:text-gray-700 font-medium"
+                    className="text-sm text-gray-600 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 font-medium"
                   >
                     Deselect All
                   </button>
@@ -123,8 +123,8 @@ export default function AISuggestionModal({
                     key={index}
                     className={`border rounded-lg p-4 cursor-pointer transition-all ${
                       selectedIndexes.has(index)
-                        ? 'border-primary-500 bg-primary-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-accent bg-accent/10'
+                        : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500'
                     }`}
                     onClick={() => toggleSelection(index)}
                   >
@@ -132,8 +132,8 @@ export default function AISuggestionModal({
                       <div
                         className={`flex-shrink-0 w-5 h-5 rounded border-2 mt-0.5 mr-3 flex items-center justify-center ${
                           selectedIndexes.has(index)
-                            ? 'border-primary-600 bg-primary-600'
-                            : 'border-gray-300'
+                            ? 'border-accent bg-accent'
+                            : 'border-gray-300 dark:border-slate-600'
                         }`}
                       >
                         {selectedIndexes.has(index) && (
@@ -142,19 +142,19 @@ export default function AISuggestionModal({
                       </div>
 
                       <div className="flex-1">
-                        <p className="text-gray-900 font-medium mb-1">
+                        <p className="text-gray-900 dark:text-slate-100 font-medium mb-1">
                           {suggestion.text}
                         </p>
 
                         {/* Additional metadata */}
                         <div className="flex flex-wrap gap-3 text-xs text-gray-600 mt-2">
                           {suggestion.occurrence && (
-                            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                            <span className="bg-accent/10 text-accent px-2 py-1 rounded">
                               Occurrence: {suggestion.occurrence}
                             </span>
                           )}
                           {suggestion.severity && (
-                            <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded">
+                            <span className="bg-accent/10 text-accent px-2 py-1 rounded">
                               Severity: {suggestion.severity}
                             </span>
                           )}
@@ -164,7 +164,7 @@ export default function AISuggestionModal({
                             </span>
                           )}
                           {suggestion.type && (
-                            <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded capitalize">
+                            <span className="bg-accent/10 text-accent px-2 py-1 rounded capitalize">
                               {suggestion.type}
                             </span>
                           )}
@@ -177,7 +177,7 @@ export default function AISuggestionModal({
 
                         {/* Reasoning */}
                         {suggestion.reasoning && (
-                          <p className="text-sm text-gray-600 mt-2 italic">
+                          <p className="text-sm text-gray-600 dark:text-slate-400 mt-2 italic">
                             {suggestion.reasoning}
                           </p>
                         )}
@@ -191,7 +191,7 @@ export default function AISuggestionModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200">
+        <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-slate-700">
           <button onClick={onClose} className="btn-secondary">
             Cancel
           </button>

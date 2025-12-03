@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { FileText, TrendingUp, AlertTriangle, CheckCircle, Clock, Users } from 'lucide-react';
-import { Project, Component, FailureMode } from '@/types';
+import { Project, Component, FailureMode, DashboardMetrics, ChartData } from '@/types';
 import { useAuth } from '@/lib/store';
+import { useProjectSettings } from '@/lib/stores/projectSettingsStore';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -19,9 +20,8 @@ import {
 import { exportToPDF, exportToExcel } from '@/lib/export';
 import toast from 'react-hot-toast';
 import dynamic from 'next/dynamic';
-import html2canvas from 'html2canvas';
 
-// Dynamically import dashboard charts for thumbnail rendering
+// Dynamically import dashboard charts for preview thumbnails only
 const HeatMapChart = dynamic(() => import('@/components/dashboard/HeatMapChart'), { ssr: false });
 const ParetoChart = dynamic(() => import('@/components/dashboard/ParetoChart'), { ssr: false });
 const RisksBubbleChart = dynamic(() => import('@/components/dashboard/RisksBubbleChart'), { ssr: false });
@@ -62,8 +62,14 @@ function ChartPreview({
 
 export default function SummaryTab({ project }: SummaryTabProps) {
   const { token } = useAuth();
+
+  // Get available standards from project settings (configured in Setup tab)
+  const { standards: availableStandards } = useProjectSettings();
+
   const [components, setComponents] = useState<Component[]>([]);
   const [failureModes, setFailureModes] = useState<FailureMode[]>([]);
+  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
+  const [chartData, setChartData] = useState<ChartData | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Export controls state
@@ -77,13 +83,14 @@ export default function SummaryTab({ project }: SummaryTabProps) {
 
   // Metadata
   const [owner, setOwner] = useState('Platform Superadmin');
-  const [standards, setStandards] = useState<string[]>(['IEC 60812 (FMEA)']);
+  // Selected standards for this export (subset of availableStandards)
+  const [selectedStandards, setSelectedStandards] = useState<string[]>([]);
   const [asset, setAsset] = useState(project.description || 'FTSA (Compressor) – High criticality');
 
   // Export state
   const [isExporting, setIsExporting] = useState(false);
 
-  // Chart refs for capturing images
+  // Chart refs for preview thumbnails only
   const heatMapRef = useRef<HTMLDivElement>(null);
   const paretoRef = useRef<HTMLDivElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
@@ -94,23 +101,31 @@ export default function SummaryTab({ project }: SummaryTabProps) {
 
   const loadData = async () => {
     try {
-      const [componentsRes, failureModesRes] = await Promise.all([
+      const [componentsRes, failureModesRes, metricsRes] = await Promise.all([
         fetch(`/api/projects/${project.id}/components`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
         fetch(`/api/projects/${project.id}/failure-modes`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
+        fetch(`/api/projects/${project.id}/metrics`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
       ]);
 
       const componentsData = await componentsRes.json();
       const failureModesData = await failureModesRes.json();
+      const metricsData = await metricsRes.json();
 
       if (componentsData.success) {
         setComponents(componentsData.data);
       }
       if (failureModesData.success) {
         setFailureModes(failureModesData.data);
+      }
+      if (metricsData.success) {
+        setMetrics(metricsData.data.metrics);
+        setChartData(metricsData.data.chartData);
       }
     } catch (error) {
       console.error('Failed to load summary data:', error);
@@ -250,55 +265,14 @@ export default function SummaryTab({ project }: SummaryTabProps) {
         }
       };
 
-      // Capture chart images if including charts and format is PDF
-      let chartImages: { heatMap?: string; pareto?: string; bubble?: string } = {};
-
-      if (format === 'pdf' && includeCharts && components.length > 0 && failureModes.length > 0) {
-        toast.dismiss();
-        toast.loading('Capturing dashboard charts...');
-
-        try {
-          // Capture HeatMap chart
-          if (heatMapRef.current) {
-            const heatMapCanvas = await html2canvas(heatMapRef.current, {
-              scale: 2,
-              logging: false,
-              backgroundColor: '#ffffff'
-            });
-            chartImages.heatMap = heatMapCanvas.toDataURL('image/png');
-          }
-
-          // Capture Pareto chart
-          if (paretoRef.current) {
-            const paretoCanvas = await html2canvas(paretoRef.current, {
-              scale: 2,
-              logging: false,
-              backgroundColor: '#ffffff'
-            });
-            chartImages.pareto = paretoCanvas.toDataURL('image/png');
-          }
-
-          // Capture Bubble chart
-          if (bubbleRef.current) {
-            const bubbleCanvas = await html2canvas(bubbleRef.current, {
-              scale: 2,
-              logging: false,
-              backgroundColor: '#ffffff'
-            });
-            chartImages.bubble = bubbleCanvas.toDataURL('image/png');
-          }
-        } catch (captureError) {
-          console.error('Failed to capture charts:', captureError);
-          // Continue export without chart images
-          chartImages = {};
-        }
-      }
+      // Charts will be generated from data in the PDF export function
+      // No need for screen capture anymore
 
       // Prepare export metadata
       const exportMetadata = {
         includeCompliance,
         includeActions,
-        standards,
+        standards: selectedStandards,
         owner,
         openActions,
         completionRate
@@ -307,8 +281,41 @@ export default function SummaryTab({ project }: SummaryTabProps) {
       // Call the appropriate export function
       if (format === 'pdf') {
         toast.dismiss();
-        toast.loading('Generating PDF...');
-        exportToPDF(projectWithAsset, exportFailureModes, metrics, undefined, components, chartImages, exportMetadata);
+        toast.loading('Generating PDF with charts...');
+
+        // Call API route for server-side PDF generation with charts
+        const response = await fetch('/api/export/pdf', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            project: projectWithAsset,
+            failureModes: exportFailureModes,
+            metrics,
+            chartData,
+            components,
+            exportMetadata,
+          }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'PDF generation failed');
+        }
+
+        // Download the PDF file
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `FMEA_${projectWithAsset.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
         toast.dismiss();
         toast.success('PDF exported successfully!');
       } else {
@@ -404,26 +411,32 @@ export default function SummaryTab({ project }: SummaryTabProps) {
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2 block">
-                  Standards (multiple allowed)
+                  Standards (multiple allowed) - From Setup Tab
                 </label>
                 <div className="space-y-1.5">
-                  {['SAE J1739', 'IEC 60812 (FMEA)', 'ISO 9001', 'AS/NZS 31000'].map((std) => (
-                    <label key={std} className="flex items-center space-x-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={standards.includes(std)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setStandards([...standards, std]);
-                          } else {
-                            setStandards(standards.filter(s => s !== std));
-                          }
-                        }}
-                        className="h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-slate-300">{std}</span>
-                    </label>
-                  ))}
+                  {availableStandards.length > 0 ? (
+                    availableStandards.map((std) => (
+                      <label key={std} className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedStandards.includes(std)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedStandards([...selectedStandards, std]);
+                            } else {
+                              setSelectedStandards(selectedStandards.filter(s => s !== std));
+                            }
+                          }}
+                          className="h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"
+                        />
+                        <span className="text-sm text-gray-700 dark:text-slate-300">{std}</span>
+                      </label>
+                    ))
+                  ) : (
+                    <p className="text-xs text-gray-500 dark:text-slate-500 italic">
+                      No standards configured. Go to Setup tab to select standards.
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -479,7 +492,7 @@ export default function SummaryTab({ project }: SummaryTabProps) {
             <div>
               <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100">Executive Summary Report</h1>
               <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">Asset: {asset}</p>
-              <p className="text-xs text-gray-500 dark:text-slate-500">Standards: {standards.join(', ')} • Owner: {owner}</p>
+              <p className="text-xs text-gray-500 dark:text-slate-500">Standards: {selectedStandards.join(', ') || 'None selected'} • Owner: {owner}</p>
             </div>
             <Badge variant="secondary" className="text-xs">{format.toUpperCase()} Preview</Badge>
           </div>
@@ -635,9 +648,13 @@ export default function SummaryTab({ project }: SummaryTabProps) {
                 <div className="bg-gray-50 dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-700 p-4">
                   <h4 className="text-sm font-semibold text-gray-900 dark:text-slate-100 mb-3">Compliance References</h4>
                   <div className="text-sm text-gray-700 dark:text-slate-300 space-y-1">
-                    {standards.map((std) => (
-                      <div key={std}>• {std}</div>
-                    ))}
+                    {selectedStandards.length > 0 ? (
+                      selectedStandards.map((std) => (
+                        <div key={std}>• {std}</div>
+                      ))
+                    ) : (
+                      <div className="text-gray-500 dark:text-slate-500 italic">No standards selected</div>
+                    )}
                     <div>• Company Methodology v1.2</div>
                     <div>• Audit Trail ID: DEMO-12345</div>
                   </div>
@@ -664,6 +681,7 @@ export default function SummaryTab({ project }: SummaryTabProps) {
           </div>
         </div>
       </div>
+
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { FailureMode, Cause, Effect, Control } from "@/types";
 import { NextRequest, NextResponse } from 'next/server';
 import { readDatabase, writeDatabase } from '@/lib/database-simple';
 
@@ -21,7 +22,7 @@ export async function PATCH(
     const db = readDatabase();
 
     // Verify failure mode exists
-    const failureMode = db.failureModes.find(fm => fm.id === failureModeId);
+    const failureMode = db.failureModes.find((fm: FailureMode) => fm.id === failureModeId);
     if (!failureMode) {
       return NextResponse.json(
         { success: false, error: 'Failure mode not found' },
@@ -30,7 +31,7 @@ export async function PATCH(
     }
 
     // Find and update cause
-    const causeIndex = db.causes.findIndex(c => c.id === causeId);
+    const causeIndex = db.causes.findIndex((c: Cause) => c.id === causeId);
     if (causeIndex === -1) {
       return NextResponse.json(
         { success: false, error: 'Cause not found' },
@@ -74,7 +75,7 @@ export async function DELETE(
     const db = readDatabase();
 
     // Verify failure mode exists
-    const failureMode = db.failureModes.find(fm => fm.id === failureModeId);
+    const failureMode = db.failureModes.find((fm: FailureMode) => fm.id === failureModeId);
     if (!failureMode) {
       return NextResponse.json(
         { success: false, error: 'Failure mode not found' },
@@ -83,7 +84,7 @@ export async function DELETE(
     }
 
     // Find cause
-    const causeIndex = db.causes.findIndex(c => c.id === causeId);
+    const causeIndex = db.causes.findIndex((c: Cause) => c.id === causeId);
     if (causeIndex === -1) {
       return NextResponse.json(
         { success: false, error: 'Cause not found' },

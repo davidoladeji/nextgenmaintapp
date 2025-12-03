@@ -9,6 +9,21 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Exclude packages with native dependencies from bundling
+  experimental: {
+    serverComponentsExternalPackages: ['canvas', 'chartjs-node-canvas'],
+  },
+  // Configure webpack to handle native modules
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Externalize canvas and related native modules for server-side rendering
+      config.externals = config.externals || [];
+      config.externals.push({
+        canvas: 'commonjs canvas',
+      });
+    }
+    return config;
+  },
 }
 
 module.exports = nextConfig

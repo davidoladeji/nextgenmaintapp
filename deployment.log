@@ -1,0 +1,168 @@
+🚀 Starting deployment to ngmapp.codesett.com...
+📁 Creating directories on server...
+📤 Uploading project files...
+Transfer starting: 338 files
+./
+deployment.log
+package.json
+pnpm-lock.yaml
+.claude/
+.claude/settings.local.json
+app/api/failure-modes/[id]/effects/[effectId]/
+app/api/failure-modes/[id]/effects/[effectId]/route.ts
+app/api/projects/[id]/
+app/api/projects/[id]/route.ts
+components/dashboard/
+components/dashboard/ActionStatusChart.tsx
+components/dashboard/DashboardLayout.tsx
+components/dashboard/HeatMapChart.tsx
+components/dashboard/ParetoChart.tsx
+components/dashboard/RiskDistributionChart.tsx
+components/dashboard/RisksBubbleChart.tsx
+components/dashboard/Sidebar.tsx
+components/fmea/
+components/fmea/CreateFailureModeModal.tsx
+components/fmea/SetupTab.tsx
+components/fmea/SummaryTab.tsx
+components/fmea/v2/
+components/fmea/v2/SimpleEditModal.tsx
+components/fmea/v2/SmartTableIntegrated.tsx
+components/project/
+components/project/ProjectSelector.tsx
+components/project/ProjectSettingsModal.tsx
+data/fmea-data.json
+lib/
+lib/database-simple.ts
+lib/export.ts
+lib/mastra/
+lib/mastra/agents/
+lib/mastra/agents/causes-agent.ts
+lib/mastra/agents/effects-agent.ts
+lib/mastra/agents/failure-mode-agent.ts
+lib/stores/
+lib/stores/riskSettingsStore.ts
+lib/types/
+lib/types/fmea.ts
+mastra/
+mastra/config.ts
+
+sent 122733 bytes  received 6934 bytes  20617 bytes/sec
+total size is 3280622  speedup is 25.30
+📋 Uploading PM2 configuration...
+🌐 Uploading Nginx configuration...
+scp: dest open "/etc/nginx/sites-available/ngmapp.codesett.com": No such file or directory
+scp: failed to upload file /Users/macbook/Development/nextmint-app/nginx.conf to /etc/nginx/sites-available/ngmapp.codesett.com
+📦 Installing dependencies and building...
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +275 -1
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+
+   ╭──────────────────────────────────────────╮
+   │                                          │
+   │   Update available! 10.15.0 → 10.20.0.   │
+   │   Changelog: https://pnpm.io/v/10.20.0   │
+   │     To update, run: pnpm add -g pnpm     │
+   │                                          │
+   ╰──────────────────────────────────────────╯
+
+Progress: resolved 275, reused 2, downloaded 141, added 141
+Progress: resolved 275, reused 2, downloaded 271, added 272
+Progress: resolved 275, reused 2, downloaded 273, added 274, done
+
+dependencies:
++ @mastra/core 0.21.1
+- @radix-ui/react-slot 1.2.3
++ ai 5.0.76
++ html2canvas 1.4.1
++ zod 3.24.1
+
+╭ Warning ─────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│   Ignored build scripts: protobufjs.                                         │
+│   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+│   to run scripts.                                                            │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+Done in 3.5s using pnpm v10.15.0
+
+> ai-fmea-builder@1.0.0 build /home/peerisfh/nextgenmaintapp
+> next build
+
+  ▲ Next.js 14.2.31
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+./app/fmea-test/page.tsx:37:9
+Type error: Object literal may only specify known properties, and 'actionTaken' does not exist in type 'CreateEffectInput'.
+
+[0m [90m 35 |[39m         justificationPost[33m:[39m [32m'Improved design prevents seal wear'[39m[33m,[39m[0m
+[0m [90m 36 |[39m         responsible[33m:[39m [32m'Engineering Team'[39m[33m,[39m[0m
+[0m[31m[1m>[22m[39m[90m 37 |[39m         actionTaken[33m:[39m [32m''[39m[33m,[39m[0m
+[0m [90m    |[39m         [31m[1m^[22m[39m[0m
+[0m [90m 38 |[39m         completionDate[33m:[39m [36mnull[39m[33m,[39m[0m
+[0m [90m 39 |[39m         sevPost[33m:[39m [35m3[39m[33m,[39m[0m
+[0m [90m 40 |[39m         occPost[33m:[39m [35m2[39m[33m,[39m[0m
+Next.js build worker exited with code: 1 and signal: null
+ ELIFECYCLE  Command failed with exit code 1.
+🔗 Enabling Nginx site...
+ln: target '/etc/nginx/sites-enabled/' is not a directory: No such file or directory
+nginx: [warn] the "listen ... http2" directive is deprecated, use the "http2" directive instead in /etc/nginx/conf.d/users/includes/fundbzyh_custom.conf:5
+nginx: [warn] the "listen ... http2" directive is deprecated, use the "http2" directive instead in /etc/nginx/conf.d/users/includes/fundbzyh_custom.conf:6
+nginx: [warn] the "listen ... http2" directive is deprecated, use the "http2" directive instead in /etc/nginx/conf.d/users/includes/fundbzyh_custom.conf:46
+nginx: [warn] the "listen ... http2" directive is deprecated, use the "http2" directive instead in /etc/nginx/conf.d/users/includes/fundbzyh_custom.conf:47
+nginx: [warn] the "listen ... http2" directive is deprecated, use the "http2" directive instead in /etc/nginx/conf.d/users/includes/fundbzyh_custom.conf:89
+nginx: [warn] the "listen ... http2" directive is deprecated, use the "http2" directive instead in /etc/nginx/conf.d/users/includes/fundbzyh_custom.conf:90
+nginx: [warn] protocol options redefined for 0.0.0.0:443 in /etc/nginx/conf.d/ai-assessment.ogenticai.com.conf:8
+nginx: [warn] protocol options redefined for 0.0.0.0:443 in /etc/nginx/conf.d/default.conf:6
+nginx: [warn] protocol options redefined for [::]:443 in /etc/nginx/conf.d/default.conf:7
+nginx: [warn] conflicting server name "admin.uphiva.shop" on 0.0.0.0:80, ignored
+nginx: [warn] conflicting server name "forms.uphiva.com" on 0.0.0.0:80, ignored
+nginx: [warn] conflicting server name "ai-assessment.ogenticai.com" on 0.0.0.0:80, ignored
+nginx: [warn] conflicting server name "ogenticai.com" on 0.0.0.0:80, ignored
+nginx: [warn] conflicting server name "www.ogenticai.com" on 0.0.0.0:80, ignored
+nginx: [warn] conflicting server name "uphiva.shop" on 0.0.0.0:80, ignored
+nginx: [warn] conflicting server name "www.uphiva.shop" on 0.0.0.0:80, ignored
+nginx: [warn] conflicting server name "ngmapp.codesett.com" on 0.0.0.0:80, ignored
+nginx: [warn] conflicting server name "ddk.codesett.com" on 0.0.0.0:80, ignored
+nginx: [warn] conflicting server name "admin.uphiva.shop" on [::]:80, ignored
+nginx: [warn] conflicting server name "forms.uphiva.com" on [::]:80, ignored
+nginx: [warn] conflicting server name "uphiva.shop" on [::]:80, ignored
+nginx: [warn] conflicting server name "www.uphiva.shop" on [::]:80, ignored
+nginx: [warn] conflicting server name "admin.uphiva.shop" on 0.0.0.0:443, ignored
+nginx: [warn] conflicting server name "forms.uphiva.com" on 0.0.0.0:443, ignored
+nginx: [warn] conflicting server name "ai-assessment.ogenticai.com" on 0.0.0.0:443, ignored
+nginx: [warn] conflicting server name "ogenticai.com" on 0.0.0.0:443, ignored
+nginx: [warn] conflicting server name "www.ogenticai.com" on 0.0.0.0:443, ignored
+nginx: [warn] conflicting server name "uphiva.shop" on 0.0.0.0:443, ignored
+nginx: [warn] conflicting server name "www.uphiva.shop" on 0.0.0.0:443, ignored
+nginx: [warn] conflicting server name "ngmapp.codesett.com" on 0.0.0.0:443, ignored
+nginx: [warn] conflicting server name "ddk.codesett.com" on 0.0.0.0:443, ignored
+nginx: [warn] conflicting server name "admin.uphiva.shop" on [::]:443, ignored
+nginx: [warn] conflicting server name "forms.uphiva.com" on [::]:443, ignored
+nginx: [warn] conflicting server name "uphiva.shop" on [::]:443, ignored
+nginx: [warn] conflicting server name "www.uphiva.shop" on [::]:443, ignored
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+🔄 Starting PM2 application...
+[PM2] Applying action restartProcessId on app [nextmint-fmea](ids: [ 0 ])
+[PM2] [nextmint-fmea](0) ✓
+┌────┬────────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name                   │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼────────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 2  │ assessment-backend     │ default     │ 0.39.4  │ cluster │ 150413   │ 29h    │ 9    │ online    │ 0%       │ 33.0mb   │ root     │ disabled │
+│ 1  │ assessment-frontend    │ default     │ 0.39.4  │ cluster │ 98594    │ 29h    │ 1    │ online    │ 0%       │ 31.3mb   │ root     │ disabled │
+│ 0  │ nextmint-fmea          │ default     │ 0.39.4  │ cluster │ 746688   │ 0s     │ 1    │ online    │ 0%       │ 43.8mb   │ root     │ disabled │
+│ 3  │ ogenticai-main         │ default     │ 1.0.0   │ fork    │ 174669   │ 28h    │ 1    │ online    │ 0%       │ 26.8mb   │ root     │ disabled │
+└────┴────────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+[PM2] Saving current process list...
+[PM2] Successfully saved in /root/.pm2/dump.pm2
+✅ Deployment complete!
+🌐 Your app should be available at: https://ngmapp.codesett.com
+📊 Check PM2 status: ssh root@159.198.66.158 'pm2 status'
+📝 View logs: ssh root@159.198.66.158 'pm2 logs nextmint-fmea'

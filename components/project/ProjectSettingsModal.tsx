@@ -20,6 +20,7 @@ export default function ProjectSettingsModal({ project, onClose, onUpdate }: Pro
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description || '');
+  const [status, setStatus] = useState<'in-progress' | 'completed' | 'approved'>(project.status);
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -39,6 +40,7 @@ export default function ProjectSettingsModal({ project, onClose, onUpdate }: Pro
         body: JSON.stringify({
           name: name.trim(),
           description: description.trim() || null,
+          status,
         }),
       });
 
@@ -91,10 +93,10 @@ export default function ProjectSettingsModal({ project, onClose, onUpdate }: Pro
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full">
         {/* Header */}
-        <div className="bg-gradient-to-r from-monday-purple to-monday-softPurple px-6 py-4 flex items-center justify-between rounded-t-lg">
+        <div className="bg-accent px-6 py-4 flex items-center justify-between rounded-t-lg">
           <div className="flex items-center space-x-3">
             <Settings className="w-6 h-6 text-white" />
             <h2 className="text-xl font-bold text-white">Project Settings</h2>
@@ -111,58 +113,74 @@ export default function ProjectSettingsModal({ project, onClose, onUpdate }: Pro
         <div className="p-6 space-y-6">
           {/* Project Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">
               Project Name *
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-monday-purple"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">
               Description (Optional)
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-monday-purple"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
               placeholder="Brief description of this FMEA project..."
             />
           </div>
 
+          {/* Project Status */}
+          <div>
+            <label className="block text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">
+              Project Status
+            </label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value as 'in-progress' | 'completed' | 'approved')}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+            >
+              <option value="in-progress">In Progress</option>
+              <option value="completed">Completed</option>
+              <option value="approved">Approved</option>
+            </select>
+          </div>
+
           {/* Asset Info (Read-only) */}
           {project.asset && (
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-              <h3 className="font-semibold text-gray-900 mb-3">Asset Information</h3>
+            <div className="bg-gray-50 dark:bg-slate-900 rounded-lg p-4 border border-gray-200 dark:border-slate-700">
+              <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-3">Asset Information</h3>
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <span className="text-gray-600">Asset Name:</span>
-                  <span className="ml-2 font-medium text-gray-900">{project.asset.name}</span>
+                  <span className="text-gray-600 dark:text-slate-400">Asset Name:</span>
+                  <span className="ml-2 font-medium text-gray-900 dark:text-slate-100">{project.asset.name}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Type:</span>
-                  <span className="ml-2 font-medium text-gray-900">{project.asset.type}</span>
+                  <span className="text-gray-600 dark:text-slate-400">Type:</span>
+                  <span className="ml-2 font-medium text-gray-900 dark:text-slate-100">{project.asset.type}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Criticality:</span>
-                  <span className="ml-2 font-medium text-gray-900 capitalize">{project.asset.criticality}</span>
+                  <span className="text-gray-600 dark:text-slate-400">Criticality:</span>
+                  <span className="ml-2 font-medium text-gray-900 dark:text-slate-100 capitalize">{project.asset.criticality}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Context:</span>
-                  <span className="ml-2 font-medium text-gray-900">{project.asset.context}</span>
+                  <span className="text-gray-600 dark:text-slate-400">Context:</span>
+                  <span className="ml-2 font-medium text-gray-900 dark:text-slate-100">{project.asset.context}</span>
                 </div>
               </div>
             </div>
           )}
 
           {/* Actions */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+          <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-slate-700">
             <button
               onClick={handleDelete}
               disabled={loading}
@@ -176,7 +194,7 @@ export default function ProjectSettingsModal({ project, onClose, onUpdate }: Pro
               <button
                 onClick={onClose}
                 disabled={loading}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
               >
                 Cancel
               </button>
@@ -186,7 +204,7 @@ export default function ProjectSettingsModal({ project, onClose, onUpdate }: Pro
                 className={`px-6 py-2 rounded-lg font-medium transition-all ${
                   loading || !name.trim()
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-monday-purple to-monday-softPurple text-white hover:shadow-lg hover:scale-105'
+                    : 'bg-accent text-white hover:bg-accent hover:shadow-lg hover:scale-105'
                 }`}
               >
                 <Save className="w-4 h-4 mr-2 inline" />

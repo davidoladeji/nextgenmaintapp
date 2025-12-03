@@ -75,10 +75,10 @@ export default function AcceptInvitationPage({ params }: { params: { token: stri
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-monday-paleBlue via-white to-monday-lightPurple flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <div className="spinner mb-4 mx-auto" />
-          <p className="text-gray-600">Validating invitation...</p>
+          <p className="text-gray-600 dark:text-slate-400">Validating invitation...</p>
         </div>
       </div>
     );
@@ -86,16 +86,16 @@ export default function AcceptInvitationPage({ params }: { params: { token: stri
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <AlertCircle className="w-8 h-8 text-red-600" />
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-8 max-w-md w-full text-center border border-gray-200 dark:border-slate-700">
+          <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Invalid Invitation</h1>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-2">Invalid Invitation</h1>
+          <p className="text-gray-600 dark:text-slate-400 mb-6">{error}</p>
           <button
             onClick={() => router.push('/')}
-            className="btn-primary btn-md"
+            className="px-6 py-2 bg-accent text-white rounded-lg hover:shadow-lg transition-all"
           >
             Go to Login
           </button>
@@ -105,29 +105,29 @@ export default function AcceptInvitationPage({ params }: { params: { token: stri
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-monday-paleBlue via-white to-monday-lightPurple flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-lg w-full overflow-hidden">
-        <div className="bg-gradient-to-r from-monday-purple to-monday-softPurple px-8 py-6 text-white">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-lg w-full overflow-hidden border border-gray-200 dark:border-slate-700">
+        <div className="bg-accent/10 dark:bg-accent/20 px-8 py-6 border-b border-gray-200 dark:border-slate-700">
           <div className="flex items-center space-x-3 mb-2">
-            <Mail className="w-8 h-8" />
-            <h1 className="text-2xl font-bold">You're Invited!</h1>
+            <Mail className="w-8 h-8 text-accent" />
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">You're Invited!</h1>
           </div>
-          <p className="text-white/90">Join your team on NextGenMaint</p>
+          <p className="text-gray-600 dark:text-slate-400">Join your team on NextGenMaint</p>
         </div>
 
         <div className="p-8 space-y-6">
           {invitation && (
             <>
-              <div className="bg-monday-lightPurple border border-monday-purple/30 rounded-lg p-4">
+              <div className="bg-accent/10 dark:bg-accent/20 border border-accent/30 dark:border-accent/50 rounded-lg p-4">
                 <div className="flex items-start space-x-3">
-                  <Building className="w-5 h-5 text-monday-purple mt-0.5" />
+                  <Building className="w-5 h-5 text-accent mt-0.5" />
                   <div className="flex-1">
-                    <p className="text-sm text-gray-700">
+                    <p className="text-sm text-gray-700 dark:text-slate-300">
                       <strong>{invitation.organization?.name}</strong> has invited you to join as{' '}
                       <span className="font-semibold capitalize">{invitation.role.replace('_', ' ')}</span>
                     </p>
                     {invitation.inviter && (
-                      <p className="text-xs text-gray-600 mt-1">
+                      <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">
                         Invited by {invitation.inviter.name}
                       </p>
                     )}
@@ -137,45 +137,45 @@ export default function AcceptInvitationPage({ params }: { params: { token: stri
 
               {!hasAccount ? (
                 <div className="space-y-4">
-                  <p className="text-sm text-gray-700">Create your account to get started:</p>
+                  <p className="text-sm text-gray-700 dark:text-slate-300">Create your account to get started:</p>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">Full Name *</label>
+                    <label className="block text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">Full Name *</label>
                     <input
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Enter your name"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-monday-purple"
+                      className="w-full px-4 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-gray-900 dark:text-slate-100 placeholder:text-gray-500 dark:placeholder:text-slate-400"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">Password *</label>
+                    <label className="block text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">Password *</label>
                     <input
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Create a password"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-monday-purple"
+                      className="w-full px-4 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-gray-900 dark:text-slate-100 placeholder:text-gray-500 dark:placeholder:text-slate-400"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">Confirm Password *</label>
+                    <label className="block text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">Confirm Password *</label>
                     <input
                       type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Confirm your password"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-monday-purple"
+                      className="w-full px-4 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-gray-900 dark:text-slate-100 placeholder:text-gray-500 dark:placeholder:text-slate-400"
                     />
                   </div>
 
                   <button
                     onClick={handleAccept}
                     disabled={accepting}
-                    className="w-full py-3 bg-gradient-to-r from-monday-purple to-monday-softPurple text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                    className="w-full py-3 bg-accent text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
                   >
                     <UserPlus className="w-4 h-4 mr-2 inline" />
                     {accepting ? 'Creating Account...' : 'Create Account & Join'}
@@ -183,13 +183,13 @@ export default function AcceptInvitationPage({ params }: { params: { token: stri
                 </div>
               ) : (
                 <div className="text-center">
-                  <p className="text-sm text-gray-700 mb-4">
+                  <p className="text-sm text-gray-700 dark:text-slate-300 mb-4">
                     You already have an account with <strong>{invitation.email}</strong>
                   </p>
                   <button
                     onClick={handleAccept}
                     disabled={accepting}
-                    className="w-full py-3 bg-gradient-to-r from-monday-purple to-monday-softPurple text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                    className="w-full py-3 bg-accent text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
                   >
                     <CheckCircle className="w-4 h-4 mr-2 inline" />
                     {accepting ? 'Joining...' : `Join ${invitation.organization?.name}`}

@@ -23,10 +23,6 @@ import {
 } from 'lucide-react';
 import { useUI, useProject, useOrganization, useAuth } from '@/lib/store';
 import { isSuperAdmin } from '@/lib/permissions-client';
-import CreateFailureModeModal from '../fmea/CreateFailureModeModal';
-import CreateProjectModal from '../project/CreateProjectModal';
-import ShareProjectModal from '../project/ShareProjectModal';
-import ProjectSettingsModal from '../project/ProjectSettingsModal';
 import OrganizationSwitcher from '../organization/OrganizationSwitcher';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
@@ -38,10 +34,6 @@ export default function Sidebar() {
   const { currentOrganization } = useOrganization();
   const { user } = useAuth();
   const [expandedSections, setExpandedSections] = useState({});
-  const [showCreateFailureModeModal, setShowCreateFailureModeModal] = useState(false);
-  const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
-  const [showShareProjectModal, setShowShareProjectModal] = useState(false);
-  const [showProjectSettingsModal, setShowProjectSettingsModal] = useState(false);
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({
@@ -55,17 +47,12 @@ export default function Sidebar() {
       toast.error('Please select a project first');
       return;
     }
-    setShowCreateFailureModeModal(true);
+    router.push(`/projects/${currentProject.id}/failure-modes/new`);
   };
 
   const handleAIAction = (prompt: string) => {
     setAiChatMinimized(false);
     // The AI panel will handle the prompt
-  };
-
-  const handleRefreshData = () => {
-    // Reload failure modes
-    window.location.reload();
   };
 
   const handleBackToProjects = () => {
@@ -76,6 +63,7 @@ export default function Sidebar() {
   const handleDashboardClick = () => {
     setCurrentProject(null);
     setCurrentView('tools');
+    router.push('/'); // Ensure consistent navigation
   };
 
   if (sidebarCollapsed) {
@@ -159,7 +147,7 @@ export default function Sidebar() {
             <h3 className="text-sm font-medium text-gray-900 dark:text-slate-100 mb-3">Quick Actions</h3>
             <div className="space-y-2">
               <button
-                onClick={() => setShowCreateProjectModal(true)}
+                onClick={() => router.push('/projects/new')}
                 className="btn-primary btn-md w-full justify-start"
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -292,14 +280,14 @@ export default function Sidebar() {
           <h3 className="text-sm font-medium text-gray-900 dark:text-slate-100 mb-3">Project</h3>
           <div className="space-y-2">
             <button
-              onClick={() => setShowShareProjectModal(true)}
+              onClick={() => router.push(`/projects/${currentProject.id}/share`)}
               className="btn-secondary btn-sm w-full justify-start"
             >
               <Share2 className="w-4 h-4 mr-2" />
               Share Project
             </button>
             <button
-              onClick={() => setShowProjectSettingsModal(true)}
+              onClick={() => router.push(`/projects/${currentProject.id}/settings`)}
               className="btn-secondary btn-sm w-full justify-start"
             >
               <Settings className="w-4 h-4 mr-2" />
@@ -308,45 +296,6 @@ export default function Sidebar() {
           </div>
         </div>
       </div>
-      )}
-
-      {/* Modals */}
-      {showCreateFailureModeModal && currentProject && (
-        <CreateFailureModeModal
-          project={currentProject}
-          onClose={() => setShowCreateFailureModeModal(false)}
-          onSuccess={() => {
-            setShowCreateFailureModeModal(false);
-            handleRefreshData();
-          }}
-        />
-      )}
-
-      {showCreateProjectModal && (
-        <CreateProjectModal
-          onClose={() => setShowCreateProjectModal(false)}
-          onSuccess={(project) => {
-            setShowCreateProjectModal(false);
-            setCurrentProject(project);
-          }}
-        />
-      )}
-
-      {showShareProjectModal && currentProject && (
-        <ShareProjectModal
-          project={currentProject}
-          onClose={() => setShowShareProjectModal(false)}
-        />
-      )}
-
-      {showProjectSettingsModal && currentProject && (
-        <ProjectSettingsModal
-          project={currentProject}
-          onClose={() => setShowProjectSettingsModal(false)}
-          onUpdate={(updatedProject) => {
-            setCurrentProject(updatedProject);
-          }}
-        />
       )}
     </div>
   );

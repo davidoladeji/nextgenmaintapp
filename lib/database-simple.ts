@@ -207,7 +207,16 @@ export const queries = {
           if (asset && !Array.isArray(asset.standards)) {
             asset = { ...asset, standards: [] };
           }
-          return { ...p, asset };
+
+          // Get all components for this project
+          const components = db.components.filter((c: any) => c.project_id === p.id);
+
+          // Get all failure modes for these components
+          const failureModes = db.failureModes.filter((fm: any) =>
+            components.some((c: any) => c.id === fm.component_id)
+          );
+
+          return { ...p, asset, components, failureModes };
         })
         .sort((a: any, b: any) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
     }
@@ -232,7 +241,16 @@ export const queries = {
           if (asset && !Array.isArray(asset.standards)) {
             asset = { ...asset, standards: [] };
           }
-          return { ...p, asset };
+
+          // Get all components for this project
+          const components = db.components.filter((c: any) => c.project_id === p.id);
+
+          // Get all failure modes for these components
+          const failureModes = db.failureModes.filter((fm: any) =>
+            components.some((c: any) => c.id === fm.component_id)
+          );
+
+          return { ...p, asset, components, failureModes };
         })
         .sort((a: any, b: any) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
     }
@@ -256,7 +274,16 @@ export const queries = {
         if (asset && !Array.isArray(asset.standards)) {
           asset = { ...asset, standards: [] };
         }
-        return { ...project, asset };
+
+        // Get all components for this project
+        const components = db.components.filter((c: any) => c.project_id === project.id);
+
+        // Get all failure modes for these components
+        const failureModes = db.failureModes.filter((fm: any) =>
+          components.some((c: any) => c.id === fm.component_id)
+        );
+
+        return { ...project, asset, components, failureModes };
       }
       return null;
     }
@@ -384,6 +411,22 @@ export const queries = {
     get: (id: string) => {
       const db = readDatabase();
       return db.failureModes.find((fm: any) => fm.id === id);
+    }
+  },
+
+  updateFailureMode: {
+    run: (id: string, failureMode: string, owner?: string | null) => {
+      const db = readDatabase();
+      const fmIndex = db.failureModes.findIndex((fm: any) => fm.id === id);
+      if (fmIndex !== -1) {
+        db.failureModes[fmIndex] = {
+          ...db.failureModes[fmIndex],
+          failure_mode: failureMode,
+          owner: owner !== undefined ? owner : db.failureModes[fmIndex].owner,
+          updated_at: new Date().toISOString()
+        };
+        writeDatabase(db);
+      }
     }
   },
 

@@ -95,7 +95,7 @@ export default function TourStep({
     // Ensure the tour step stays within viewport bounds
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    const tourStepWidth = step.position === 'center' ? 512 : 384; // 32rem : 24rem
+    const tourStepWidth = (step.position as string) === 'center' ? 512 : 384; // 32rem : 24rem
     const tourStepHeight = 300; // Approximate height
 
     // Adjust horizontal position if too far right
@@ -167,7 +167,7 @@ export default function TourStep({
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="absolute bg-white rounded-lg shadow-2xl border border-gray-200 max-w-md w-full mx-4"
+        className="absolute bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-gray-200 dark:border-slate-700 max-w-md w-full mx-4"
         style={{
           ...position,
           zIndex: 51,
@@ -175,52 +175,52 @@ export default function TourStep({
         }}
       >
         {/* Header */}
-        <div className="p-4 border-b border-gray-100">
+        <div className="p-4 border-b border-gray-100 dark:border-slate-700">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                <HelpCircle className="w-4 h-4 text-primary-600" />
+              <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+                <HelpCircle className="w-4 h-4 text-primary-600 dark:text-primary-400" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">{step.title}</h3>
-                <p className="text-sm text-gray-500">
+                <h3 className="font-semibold text-gray-900 dark:text-slate-100">{step.title}</h3>
+                <p className="text-sm text-gray-500 dark:text-slate-400">
                   Step {currentStep} of {totalSteps}
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-1 hover:bg-gray-100 rounded-md transition-colors"
+              className="p-1 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors"
               title="Close tour"
             >
-              <X className="w-4 h-4 text-gray-500" />
+              <X className="w-4 h-4 text-gray-500 dark:text-slate-400" />
             </button>
           </div>
         </div>
 
         {/* Content */}
         <div className="p-4">
-          <p className="text-gray-700 leading-relaxed">{step.content}</p>
+          <p className="text-gray-700 dark:text-slate-300 leading-relaxed">{step.content}</p>
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-100 bg-gray-50 rounded-b-lg">
+        <div className="p-4 border-t border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 rounded-b-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               {canGoPrevious && (
                 <button
                   onClick={onPrevious}
-                  className="flex items-center space-x-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                  className="flex items-center space-x-1 px-3 py-1.5 text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>Previous</span>
                 </button>
               )}
-              
+
               {!isLastStep && (
                 <button
                   onClick={onSkip}
-                  className="px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                  className="px-3 py-1.5 text-sm text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 transition-colors"
                 >
                   Skip tour
                 </button>

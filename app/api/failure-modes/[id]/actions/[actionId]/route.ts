@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readDatabase, writeDatabase } from '@/lib/database-simple';
+import { FailureMode, Action } from '@/types';
 
 export async function PATCH(
   request: NextRequest,
@@ -21,7 +22,7 @@ export async function PATCH(
     const db = readDatabase();
 
     // Verify failure mode exists
-    const failureMode = db.failureModes.find(fm => fm.id === failureModeId);
+    const failureMode = db.failureModes.find((fm: FailureMode) => fm.id === failureModeId);
     if (!failureMode) {
       return NextResponse.json(
         { success: false, error: 'Failure mode not found' },
@@ -30,7 +31,7 @@ export async function PATCH(
     }
 
     // Find and update action
-    const actionIndex = db.actions.findIndex(a => a.id === actionId);
+    const actionIndex = db.actions.findIndex((a: Action) => a.id === actionId);
     if (actionIndex === -1) {
       return NextResponse.json(
         { success: false, error: 'Action not found' },
@@ -76,7 +77,7 @@ export async function DELETE(
     const db = readDatabase();
 
     // Verify failure mode exists
-    const failureMode = db.failureModes.find(fm => fm.id === failureModeId);
+    const failureMode = db.failureModes.find((fm: FailureMode) => fm.id === failureModeId);
     if (!failureMode) {
       return NextResponse.json(
         { success: false, error: 'Failure mode not found' },
@@ -85,7 +86,7 @@ export async function DELETE(
     }
 
     // Find action
-    const actionIndex = db.actions.findIndex(a => a.id === actionId);
+    const actionIndex = db.actions.findIndex((a: Action) => a.id === actionId);
     if (actionIndex === -1) {
       return NextResponse.json(
         { success: false, error: 'Action not found' },

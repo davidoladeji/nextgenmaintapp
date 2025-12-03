@@ -9,36 +9,38 @@ interface RisksBubbleChartProps {
 }
 
 export default function RisksBubbleChart({ failureModes, onBubbleClick }: RisksBubbleChartProps) {
-  const calculateMaxRPN = (failureMode: FailureMode) => {
-    if (!failureMode.causes?.length || !failureMode.effects?.length) return { rpn: 0, sev: 0, occ: 0, det: 10 };
+  // Calculate POST-mitigation RPN from actions
+  const calculatePostRPN = (failureMode: FailureMode) => {
+    if (!failureMode.actions || failureMode.actions.length === 0) {
+      return { rpn: 0, sev: 0, occ: 0, det: 10 };
+    }
 
     let maxRPN = 0;
     let maxSev = 0;
     let maxOcc = 0;
     let maxDet = 10;
 
-    for (const cause of failureMode.causes) {
-      for (const effect of failureMode.effects) {
-        const detection = failureMode.controls?.length
-          ? Math.min(...failureMode.controls.map(c => c.detection))
-          : 10;
-        const rpn = effect.severity * cause.occurrence * detection;
+    for (const action of failureMode.actions) {
+      // Use post-action values if available
+      const sev = action.postActionSeverity || 0;
+      const occ = action.postActionOccurrence || 0;
+      const det = action.postActionDetection || 10;
+      const rpn = sev * occ * det;
 
-        if (rpn > maxRPN) {
-          maxRPN = rpn;
-          maxSev = effect.severity;
-          maxOcc = cause.occurrence;
-          maxDet = detection;
-        }
+      if (rpn > maxRPN && sev > 0 && occ > 0) {
+        maxRPN = rpn;
+        maxSev = sev;
+        maxOcc = occ;
+        maxDet = det;
       }
     }
     return { rpn: maxRPN, sev: maxSev, occ: maxOcc, det: maxDet };
   };
 
-  // Prepare data for bubble chart
+  // Prepare data for bubble chart - only show Medium, High, Critical (RPN >= 70)
   const chartData = failureModes
     .map((fm) => {
-      const { rpn, sev, occ, det } = calculateMaxRPN(fm);
+      const { rpn, sev, occ, det } = calculatePostRPN(fm);
       return {
         name: fm.failure_mode,
         x: occ, // Occurrence on X-axis
@@ -50,7 +52,7 @@ export default function RisksBubbleChart({ failureModes, onBubbleClick }: RisksB
         failureMode: fm,
       };
     })
-    .filter((d) => d.rpn > 0)
+    .filter((d) => d.rpn >= 70) // Only show Medium, High, Critical (filter out Low)
     .sort((a, b) => b.rpn - a.rpn)
     .slice(0, 20); // Show top 20
 
@@ -61,9 +63,8 @@ export default function RisksBubbleChart({ failureModes, onBubbleClick }: RisksB
     return '#22c55e'; // green-500
   };
 
-  // Non-linear scale: compress 0-4 to 1 tile, spread 4-10 across remaining scale
-  // Custom ticks for non-linear scale
-  const customTicks = [0, 4, 5, 6, 7, 8, 9, 10];
+  // Scale starts from 2 as origin (relevant range for risk assessment)
+  const customTicks = [2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -126,7 +127,7 @@ export default function RisksBubbleChart({ failureModes, onBubbleClick }: RisksB
               type="number"
               dataKey="x"
               name="Occurrence"
-              domain={[0, 10]}
+              domain={[1.7, 10.3]}
               ticks={customTicks}
               label={{ value: 'Occurrence (OCC)', position: 'bottom', offset: 40, fill: '#6b7280' }}
               tick={{ fontSize: 12, fill: '#6b7280' }}
@@ -137,7 +138,7 @@ export default function RisksBubbleChart({ failureModes, onBubbleClick }: RisksB
               type="number"
               dataKey="y"
               name="Severity"
-              domain={[0, 10]}
+              domain={[1.7, 10.3]}
               ticks={customTicks}
               label={{ value: 'Severity (SEV)', angle: -90, position: 'left', offset: 40, fill: '#6b7280' }}
               tick={{ fontSize: 12, fill: '#6b7280' }}

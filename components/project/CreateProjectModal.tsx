@@ -116,25 +116,25 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Create New Project</h2>
+    <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center p-4 z-50">
+      <div className="bg-white dark:bg-slate-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-slate-700">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100">Create New Project</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-gray-500 dark:text-slate-400" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
           {/* Project Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900">Project Information</h3>
-            
+            <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">Project Information</h3>
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Project Name *
               </label>
               <input
@@ -149,7 +149,7 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Description
               </label>
               <textarea
@@ -162,11 +162,11 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
 
           {/* Asset Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900">Asset Information</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">Asset Information</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Asset Name *
                 </label>
                 <input
@@ -181,7 +181,7 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Asset ID
                 </label>
                 <input
@@ -195,7 +195,7 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Asset Type *
                 </label>
                 <select
@@ -215,7 +215,7 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Criticality *
                 </label>
                 <select
@@ -235,7 +235,7 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Context *
               </label>
               <textarea
@@ -251,10 +251,10 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
 
           {/* Standards */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900">Standards & Templates</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">Standards & Templates</h3>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 Select applicable standards
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -266,14 +266,14 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
                       className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                       {...register('standards')}
                     />
-                    <span className="ml-2 text-sm text-gray-700">{standard}</span>
+                    <span className="ml-2 text-sm text-gray-700 dark:text-slate-300">{standard}</span>
                   </label>
                 ))}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Add custom standard
               </label>
               <div className="flex space-x-2">
@@ -299,9 +299,9 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
                   {customStandards.map((standard) => (
                     <div
                       key={standard}
-                      className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md"
+                      className="flex items-center justify-between bg-gray-50 dark:bg-slate-900 px-3 py-2 rounded-md"
                     >
-                      <span className="text-sm text-gray-700">{standard}</span>
+                      <span className="text-sm text-gray-700 dark:text-slate-300">{standard}</span>
                       <button
                         type="button"
                         onClick={() => removeCustomStandard(standard)}
@@ -318,10 +318,10 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
 
           {/* Optional Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900">Additional Information</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">Additional Information</h3>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Asset History
               </label>
               <textarea
@@ -332,7 +332,7 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                 Configuration Details
               </label>
               <textarea
@@ -344,7 +344,7 @@ export default function CreateProjectModal({ onClose, onSuccess }: CreateProject
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-200">
+          <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-slate-700">
             <button
               type="button"
               onClick={onClose}

@@ -79,26 +79,26 @@ export default function AISuggestionsModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-blue-50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-slate-700 bg-gradient-to-r from-accent/10 to-accent/10">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                 AI Suggestions: {suggestion ? getTypeLabel(suggestion.type) : 'Loading...'}
               </h3>
               {suggestion?.context && (
-                <p className="text-sm text-gray-600">{suggestion.context}</p>
+                <p className="text-sm text-gray-600 dark:text-slate-400">{suggestion.context}</p>
               )}
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 p-2 hover:bg-white rounded-lg transition-colors"
+            className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -108,17 +108,17 @@ export default function AISuggestionsModal({
         <div className="flex-1 overflow-y-auto p-6">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12">
-              <Loader2 className="w-12 h-12 text-purple-600 animate-spin mb-4" />
-              <p className="text-gray-600">Generating AI suggestions...</p>
-              <p className="text-sm text-gray-500 mt-2">This may take a few moments</p>
+              <Loader2 className="w-12 h-12 text-accent animate-spin mb-4" />
+              <p className="text-gray-600 dark:text-slate-300">Generating AI suggestions...</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400 mt-2">This may take a few moments</p>
             </div>
           ) : suggestion?.suggestions && suggestion.suggestions.length > 0 ? (
             <>
               {/* Info Banner */}
-              <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start space-x-3">
-                <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div className="mb-4 p-4 bg-accent/10 border border-accent rounded-lg flex items-start space-x-3">
+                <Info className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="text-sm text-blue-900">
+                  <p className="text-sm text-gray-700 dark:text-slate-300">
                     Review the AI-generated suggestions below. Select the ones you want to add and click "Add Selected".
                     You can edit them after they're added.
                   </p>
@@ -126,16 +126,16 @@ export default function AISuggestionsModal({
               </div>
 
               {/* Select All */}
-              <div className="mb-4 flex items-center justify-between pb-3 border-b border-gray-200">
+              <div className="mb-4 flex items-center justify-between pb-3 border-b border-gray-200 dark:border-slate-700">
                 <button
                   onClick={handleSelectAll}
-                  className="text-sm font-medium text-purple-600 hover:text-purple-700 hover:underline"
+                  className="text-sm font-medium text-accent hover:text-accent hover:underline"
                 >
                   {selectedSuggestions.size === suggestion.suggestions.length
                     ? 'Deselect All'
                     : 'Select All'}
                 </button>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 dark:text-slate-400">
                   {selectedSuggestions.size} of {suggestion.suggestions.length} selected
                 </span>
               </div>
@@ -150,8 +150,8 @@ export default function AISuggestionsModal({
                       key={index}
                       className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
                         isSelected
-                          ? 'border-purple-500 bg-purple-50 shadow-md'
-                          : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                          ? 'border-accent bg-accent/10 shadow-md'
+                          : 'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-900 hover:border-gray-300 dark:hover:border-slate-500 hover:shadow-sm'
                       }`}
                       onClick={() => handleToggle(index)}
                     >
@@ -160,7 +160,7 @@ export default function AISuggestionsModal({
                         <div
                           className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 transition-colors ${
                             isSelected
-                              ? 'bg-purple-600 border-purple-600'
+                              ? 'bg-accent border-accent'
                               : 'bg-white border-gray-300'
                           }`}
                         >
@@ -170,7 +170,7 @@ export default function AISuggestionsModal({
                         {/* Content */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between mb-2">
-                            <p className="font-medium text-gray-900 flex-1">{item.text}</p>
+                            <p className="font-medium text-gray-900 dark:text-slate-100 flex-1">{item.text}</p>
                             <span
                               className={`ml-3 flex-shrink-0 px-2 py-1 rounded-full text-xs font-medium border ${getConfidenceColor(
                                 item.confidence
@@ -179,7 +179,7 @@ export default function AISuggestionsModal({
                               {Math.round(item.confidence * 100)}% confidence
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600 leading-relaxed">{item.reasoning}</p>
+                          <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">{item.reasoning}</p>
                         </div>
                       </div>
                     </div>
@@ -189,28 +189,28 @@ export default function AISuggestionsModal({
             </>
           ) : (
             <div className="flex flex-col items-center justify-center py-12">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <Sparkles className="w-8 h-8 text-gray-400" />
+              <div className="w-16 h-16 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center mb-4">
+                <Sparkles className="w-8 h-8 text-gray-400 dark:text-slate-500" />
               </div>
-              <p className="text-gray-600 mb-2">No suggestions available</p>
-              <p className="text-sm text-gray-500">The AI couldn't generate suggestions for this context.</p>
+              <p className="text-gray-600 dark:text-slate-300 mb-2">No suggestions available</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400">The AI couldn't generate suggestions for this context.</p>
             </div>
           )}
         </div>
 
         {/* Footer */}
         {!isLoading && suggestion?.suggestions && suggestion.suggestions.length > 0 && (
-          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between rounded-b-xl">
+          <div className="px-6 py-4 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 flex items-center justify-between rounded-b-xl">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+              className="px-4 py-2 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-lg transition-colors font-medium"
             >
               Cancel
             </button>
             <button
               onClick={handleAccept}
               disabled={selectedSuggestions.size === 0}
-              className="px-6 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium shadow-sm hover:shadow-md disabled:shadow-none flex items-center space-x-2"
+              className="px-6 py-2 bg-accent hover:bg-accent disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium shadow-sm hover:shadow-md disabled:shadow-none flex items-center space-x-2"
             >
               <Check className="w-4 h-4" />
               <span>

@@ -73,9 +73,9 @@ export default function CreateOrganizationModal({ onClose, onSuccess }: CreateOr
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="bg-gradient-to-r from-monday-purple to-monday-softPurple px-6 py-4 flex items-center justify-between sticky top-0">
+        <div className="bg-accent px-6 py-4 flex items-center justify-between sticky top-0">
           <div className="flex items-center space-x-3">
             <Building className="w-6 h-6 text-white" />
             <h2 className="text-xl font-bold text-white">Create Organization</h2>
@@ -92,7 +92,7 @@ export default function CreateOrganizationModal({ onClose, onSuccess }: CreateOr
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Organization Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">
               Organization Name *
             </label>
             <input
@@ -100,35 +100,35 @@ export default function CreateOrganizationModal({ onClose, onSuccess }: CreateOr
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
               placeholder="e.g., Acme Mining Corp"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-monday-purple focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
               required
             />
           </div>
 
           {/* Organization Slug */}
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">
               URL Slug *
             </label>
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-500">nextgenmaint.com/</span>
+              <span className="text-sm text-gray-500 dark:text-slate-400">nextgenmaint.com/</span>
               <input
                 type="text"
                 value={slug}
                 onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
                 placeholder="acme-mining"
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-monday-purple focus:border-transparent font-mono text-sm"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent font-mono text-sm"
                 required
               />
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">
               Unique identifier for your organization (lowercase, hyphens allowed)
             </p>
           </div>
 
           {/* Plan Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-3">
+            <label className="block text-sm font-medium text-gray-900 dark:text-slate-100 mb-3">
               Select Plan
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -137,13 +137,13 @@ export default function CreateOrganizationModal({ onClose, onSuccess }: CreateOr
                 onClick={() => setPlan('free')}
                 className={`p-4 rounded-lg border-2 transition-all text-left ${
                   plan === 'free'
-                    ? 'border-monday-purple bg-monday-lightPurple'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-accent bg-accent/10'
+                    : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500'
                 }`}
               >
-                <div className="font-semibold text-gray-900">Free</div>
-                <div className="text-xs text-gray-600 mt-1">Up to 3 users</div>
-                <div className="text-xs text-gray-600">5 projects</div>
+                <div className="font-semibold text-gray-900 dark:text-slate-100">Free</div>
+                <div className="text-xs text-gray-600 dark:text-slate-400 mt-1">Up to 3 users</div>
+                <div className="text-xs text-gray-600 dark:text-slate-400">5 projects</div>
               </button>
 
               <button
@@ -151,13 +151,13 @@ export default function CreateOrganizationModal({ onClose, onSuccess }: CreateOr
                 onClick={() => setPlan('starter')}
                 className={`p-4 rounded-lg border-2 transition-all text-left ${
                   plan === 'starter'
-                    ? 'border-monday-purple bg-monday-lightPurple'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-accent bg-accent/10'
+                    : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500'
                 }`}
               >
-                <div className="font-semibold text-gray-900">Starter</div>
-                <div className="text-xs text-gray-600 mt-1">Up to 10 users</div>
-                <div className="text-xs text-gray-600">25 projects</div>
+                <div className="font-semibold text-gray-900 dark:text-slate-100">Starter</div>
+                <div className="text-xs text-gray-600 dark:text-slate-400 mt-1">Up to 10 users</div>
+                <div className="text-xs text-gray-600 dark:text-slate-400">25 projects</div>
               </button>
 
               <button
@@ -165,13 +165,13 @@ export default function CreateOrganizationModal({ onClose, onSuccess }: CreateOr
                 onClick={() => setPlan('professional')}
                 className={`p-4 rounded-lg border-2 transition-all text-left ${
                   plan === 'professional'
-                    ? 'border-monday-purple bg-monday-lightPurple'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-accent bg-accent/10'
+                    : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500'
                 }`}
               >
-                <div className="font-semibold text-gray-900">Professional</div>
-                <div className="text-xs text-gray-600 mt-1">Up to 50 users</div>
-                <div className="text-xs text-gray-600">100 projects</div>
+                <div className="font-semibold text-gray-900 dark:text-slate-100">Professional</div>
+                <div className="text-xs text-gray-600 dark:text-slate-400 mt-1">Up to 50 users</div>
+                <div className="text-xs text-gray-600 dark:text-slate-400">100 projects</div>
               </button>
 
               <button
@@ -179,34 +179,34 @@ export default function CreateOrganizationModal({ onClose, onSuccess }: CreateOr
                 onClick={() => setPlan('enterprise')}
                 className={`p-4 rounded-lg border-2 transition-all text-left ${
                   plan === 'enterprise'
-                    ? 'border-monday-purple bg-monday-lightPurple'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-accent bg-accent/10'
+                    : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500'
                 }`}
               >
-                <div className="font-semibold text-gray-900">Enterprise</div>
-                <div className="text-xs text-gray-600 mt-1">Unlimited users</div>
-                <div className="text-xs text-gray-600">Unlimited projects</div>
+                <div className="font-semibold text-gray-900 dark:text-slate-100">Enterprise</div>
+                <div className="text-xs text-gray-600 dark:text-slate-400 mt-1">Unlimited users</div>
+                <div className="text-xs text-gray-600 dark:text-slate-400">Unlimited projects</div>
               </button>
             </div>
           </div>
 
           {/* Info Box */}
-          <div className="bg-gradient-to-br from-monday-paleBlue to-monday-lightPurple border border-monday-purple/30 rounded-lg p-4">
+          <div className="bg-accent/10 border border-accent rounded-lg p-4">
             <div className="flex items-start space-x-2">
-              <div className="text-monday-purple text-lg mt-0.5">ℹ️</div>
-              <div className="flex-1 text-sm text-gray-700">
-                <p className="font-medium text-monday-darkNavy mb-1">You'll be the organization admin</p>
+              <div className="text-accent text-lg mt-0.5">ℹ️</div>
+              <div className="flex-1 text-sm text-gray-700 dark:text-slate-300">
+                <p className="font-medium text-gray-900 dark:text-slate-100 mb-1">You'll be the organization admin</p>
                 <p>You can invite team members, create projects, and manage settings after creation.</p>
               </div>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
+          <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-slate-700">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
               disabled={loading}
             >
               Cancel
@@ -217,7 +217,7 @@ export default function CreateOrganizationModal({ onClose, onSuccess }: CreateOr
               className={`px-6 py-2 rounded-lg font-medium transition-all ${
                 loading || !name.trim() || !slug.trim()
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-monday-purple to-monday-softPurple text-white hover:shadow-lg hover:scale-105 active:scale-95'
+                  : 'bg-accent text-white hover:bg-accent hover:shadow-lg hover:scale-105 active:scale-95'
               }`}
             >
               {loading ? 'Creating...' : 'Create Organization'}

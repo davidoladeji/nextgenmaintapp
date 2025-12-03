@@ -6,7 +6,15 @@ import { X, ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
 import { useUI } from '@/lib/store';
 import TourStep from './TourStep';
 
-const ONBOARDING_STEPS = [
+type OnboardingStep = {
+  id: string;
+  title: string;
+  content: string;
+  position: 'center' | 'top' | 'bottom' | 'left' | 'right';
+  target: string | null;
+};
+
+const ONBOARDING_STEPS: OnboardingStep[] = [
   {
     id: 'welcome',
     title: 'Welcome to AI-Assisted FMEA Builder!',
@@ -144,7 +152,7 @@ export default function OnboardingGuide() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          className="absolute inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm"
           onClick={handleClose}
         />
 
@@ -168,7 +176,7 @@ export default function OnboardingGuide() {
           exit={{ opacity: 0, y: 20 }}
           className="fixed bottom-4 left-1/2 transform -translate-x-1/2"
         >
-          <div className="bg-white rounded-full px-4 py-2 shadow-lg border border-gray-200">
+          <div className="bg-white dark:bg-slate-800 rounded-full px-4 py-2 shadow-lg border border-gray-200 dark:border-slate-700">
             <div className="flex items-center space-x-2">
               {ONBOARDING_STEPS.map((_, index) => (
                 <div
@@ -191,7 +199,7 @@ export default function OnboardingGuide() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed top-4 right-4 bg-white rounded-lg px-3 py-2 shadow-lg border border-gray-200 text-xs text-gray-600"
+          className="fixed top-4 right-4 bg-white dark:bg-slate-800 rounded-lg px-3 py-2 shadow-lg border border-gray-200 dark:border-slate-700 text-xs text-gray-600 dark:text-slate-400"
         >
           <div>Use ← → arrow keys or ESC to exit</div>
         </motion.div>

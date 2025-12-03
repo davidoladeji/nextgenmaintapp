@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import { Project, FailureMode, Component } from '@/types';
 import { useAuth, useProject } from '@/lib/store';
-import SmartTable from './SmartTable';
+import FMEAAccordion from './FMEAAccordion';
+import { SmartTableIntegrated } from './v2/SmartTableIntegrated';
 import FailureModeCard from './FailureModeCard';
 import DashboardOverview from '../dashboard/DashboardOverview';
-import ExportModal from '../export/ExportModal';
-import { LayoutGrid, RefreshCw, BarChart3, Download, List, Trash2, Settings, FileText } from 'lucide-react';
+import { LayoutGrid, BarChart3, List, Trash2, Settings, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
 import SetupTab from './SetupTab';
 import SummaryTab from './SummaryTab';
@@ -29,10 +29,7 @@ export default function FMEABuilder({ project }: FMEABuilderProps) {
   } = useProject();
   const [components, setComponents] = useState<Component[]>([]);
   const [selectedFailureMode, setSelectedFailureMode] = useState<FailureMode | null>(null);
-  const [viewMode, setViewMode] = useState<'dashboard' | 'smart-table' | 'cards' | 'setup' | 'summary'>('smart-table');
-  const [showExportModal, setShowExportModal] = useState(false);
-  const [dashboardMetrics, setDashboardMetrics] = useState<any>(null);
-  const [dashboardChartData, setDashboardChartData] = useState<any>(null);
+  const [viewMode, setViewMode] = useState<'dashboard' | 'analysis' | 'cards' | 'setup' | 'summary'>('analysis');
 
   useEffect(() => {
     loadFailureModes();
@@ -128,29 +125,6 @@ export default function FMEABuilder({ project }: FMEABuilderProps) {
     }
   };
 
-  const loadDashboardData = async () => {
-    try {
-      const response = await fetch(`/api/projects/${project.id}/metrics`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const result = await response.json();
-      if (result.success) {
-        setDashboardMetrics(result.data.metrics);
-        setDashboardChartData(result.data.chartData);
-      }
-    } catch (error) {
-      console.error('Failed to load dashboard data:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (viewMode === 'dashboard' || showExportModal) {
-      loadDashboardData();
-    }
-  }, [viewMode, showExportModal, project.id]);
 
   if (isLoading) {
     return (
@@ -166,119 +140,101 @@ export default function FMEABuilder({ project }: FMEABuilderProps) {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-6 py-4">
         <div className="flex items-center justify-between">
+          {/* Left: Project Info */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-100">
               {project.name}
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">
               Asset: {project.asset?.name} ({project.asset?.type}) - {project.asset?.criticality} criticality
             </p>
           </div>
-          
+
+          {/* Center: View Toggle Tabs */}
+          <div className="flex items-center bg-gray-100 dark:bg-slate-700 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('dashboard')}
+              className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm transition-colors ${
+                viewMode === 'dashboard'
+                  ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-slate-100 shadow-sm'
+                  : 'text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-slate-100'
+              }`}
+              title="Dashboard View"
+            >
+              <BarChart3 className="w-4 h-4" />
+              <span>Dashboard</span>
+            </button>
+            <button
+              onClick={() => setViewMode('analysis')}
+              className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm transition-colors ${
+                viewMode === 'analysis'
+                  ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-slate-100 shadow-sm'
+                  : 'text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-slate-100'
+              }`}
+              title="Smart Table View"
+            >
+              <List className="w-4 h-4" />
+              <span>Smart Table</span>
+            </button>
+            <button
+              onClick={() => setViewMode('cards')}
+              className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm transition-colors ${
+                viewMode === 'cards'
+                  ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-slate-100 shadow-sm'
+                  : 'text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-slate-100'
+              }`}
+              title="Card View"
+            >
+              <LayoutGrid className="w-4 h-4" />
+              <span>Cards</span>
+            </button>
+            <button
+              onClick={() => setViewMode('summary')}
+              className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm transition-colors ${
+                viewMode === 'summary'
+                  ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-slate-100 shadow-sm'
+                  : 'text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-slate-100'
+              }`}
+              title="Executive Summary"
+            >
+              <FileText className="w-4 h-4" />
+              <span>Summary</span>
+            </button>
+            <button
+              onClick={() => setViewMode('setup')}
+              className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm transition-colors ${
+                viewMode === 'setup'
+                  ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-slate-100 shadow-sm'
+                  : 'text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-slate-100'
+              }`}
+              title="FMEA Setup & Configuration"
+            >
+              <Settings className="w-4 h-4" />
+              <span>Setup</span>
+            </button>
+          </div>
+
+          {/* Right: Stats */}
           <div className="flex items-center space-x-4">
-            {/* View Toggle */}
-            <div className="flex items-center bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setViewMode('dashboard')}
-                className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm transition-colors ${
-                  viewMode === 'dashboard'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-                title="Dashboard View"
-              >
-                <BarChart3 className="w-4 h-4" />
-                <span>Dashboard</span>
-              </button>
-              <button
-                onClick={() => setViewMode('smart-table')}
-                className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm transition-colors ${
-                  viewMode === 'smart-table'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-                title="Smart Table View (Component-based)"
-              >
-                <List className="w-4 h-4" />
-                <span>Smart Table</span>
-              </button>
-              <button
-                onClick={() => setViewMode('cards')}
-                className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm transition-colors ${
-                  viewMode === 'cards'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-                title="Card View"
-              >
-                <LayoutGrid className="w-4 h-4" />
-                <span>Cards</span>
-              </button>
-              <button
-                onClick={() => setViewMode('summary')}
-                className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm transition-colors ${
-                  viewMode === 'summary'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-                title="Executive Summary"
-              >
-                <FileText className="w-4 h-4" />
-                <span>Summary</span>
-              </button>
-              <button
-                onClick={() => setViewMode('setup')}
-                className={`flex items-center space-x-1 px-3 py-1 rounded-md text-sm transition-colors ${
-                  viewMode === 'setup'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-                title="FMEA Setup & Configuration"
-              >
-                <Settings className="w-4 h-4" />
-                <span>Setup</span>
-              </button>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={loadDashboardData}
-                className="flex items-center space-x-1 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                title="Refresh Data"
-              >
-                <RefreshCw className="w-4 h-4" />
-                <span>Refresh</span>
-              </button>
-              <button
-                onClick={() => setShowExportModal(true)}
-                className="flex items-center space-x-1 px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                title="Export FMEA"
-              >
-                <Download className="w-4 h-4" />
-                <span>Export</span>
-              </button>
-            </div>
-
             <div className="text-right">
-              <div className="text-sm text-gray-500">Failure Modes</div>
-              <div className="text-2xl font-bold text-gray-900">
+              <div className="text-sm text-gray-500 dark:text-slate-400">Failure Modes</div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-slate-100">
                 {failureModes.length}
               </div>
             </div>
             <div className="text-right">
-              <div className="text-sm text-gray-500">High Risk (RPN &gt; 200)</div>
-              <div className="text-2xl font-bold text-danger-600">
+              <div className="text-sm text-gray-500 dark:text-slate-400">High Risk (RPN &gt; 200)</div>
+              <div className="text-2xl font-bold text-danger-600 dark:text-red-400">
                 {failureModes.filter(fm => (fm as any).maxRPN > 200).length}
               </div>
             </div>
             <div className="text-right">
-              <div className="text-sm text-gray-500">Open Actions</div>
-              <div className="text-2xl font-bold text-warning-600">
-                {failureModes.reduce((acc, fm) => 
-                  acc + fm.actions.filter(a => a.status === 'open').length, 0
+              <div className="text-sm text-gray-500 dark:text-slate-400">Open Actions</div>
+              <div className="text-2xl font-bold text-warning-600 dark:text-amber-500">
+                {failureModes.reduce((acc, fm) =>
+                  acc + (fm.actions?.filter((a: any) => a.status === 'open').length || 0), 0
                 )}
               </div>
             </div>
@@ -292,81 +248,75 @@ export default function FMEABuilder({ project }: FMEABuilderProps) {
           <div className="flex-1">
             <DashboardOverview
               project={project}
-              onExport={() => setShowExportModal(true)}
             />
           </div>
-        ) : viewMode === 'smart-table' ? (
-          <div className="flex-1">
-            <SmartTable
-              components={components}
+        ) : viewMode === 'analysis' ? (
+          <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-slate-900">
+            <SmartTableIntegrated
               project={project}
-              onRefresh={() => {
-                loadComponents();
-                loadFailureModes();
-              }}
-              onFailureModeClick={handleRowClick}
+              components={components}
             />
           </div>
         ) : viewMode === 'setup' ? (
-          <div className="flex-1 p-6 overflow-y-auto bg-gray-50">
+          <div className="flex-1 p-6 overflow-y-auto bg-gray-50 dark:bg-slate-900">
             <div className="max-w-7xl mx-auto">
               <SetupTab projectId={project.id} />
             </div>
           </div>
         ) : viewMode === 'summary' ? (
-          <div className="flex-1 p-6 overflow-y-auto bg-gray-50">
+          <div className="flex-1 p-6 overflow-y-auto bg-gray-50 dark:bg-slate-900">
             <div className="max-w-7xl mx-auto">
               <SummaryTab project={project} />
             </div>
           </div>
         ) : (
           /* Card Grid View */
-          <div className="flex-1 p-6 overflow-y-auto">
+          <div className="flex-1 p-6 overflow-y-auto bg-gray-50 dark:bg-slate-900">
             {failureModes.length === 0 ? (
               <div className="text-center py-12">
-                <div className="text-gray-400 mb-4">
+                <div className="text-gray-400 dark:text-slate-500 mb-4">
                   <LayoutGrid className="w-16 h-16 mx-auto" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No failure modes yet</h3>
-                <p className="text-gray-600 mb-4">Get started by creating your first failure mode analysis.</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-2">No failure modes yet</h3>
+                <p className="text-gray-600 dark:text-slate-400 mb-4">Get started by creating your first failure mode analysis.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {failureModes.map((failureMode) => (
-                  <div key={failureMode.id} className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+                  <div key={failureMode.id} className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 hover:shadow-md transition-shadow">
                     <div className="p-4">
                       <div className="flex items-start justify-between mb-3">
-                        <h3 className="font-medium text-gray-900 line-clamp-2">
+                        <h3 className="font-medium text-gray-900 dark:text-slate-100 line-clamp-2">
                           {failureMode.failure_mode}
                         </h3>
-                        <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full ml-2">
+                        <span className="text-xs px-2 py-1 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-300 rounded-full ml-2">
                           {failureMode.process_step}
                         </span>
                       </div>
-                      
+
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Causes:</span>
-                          <span className="font-medium text-gray-900">{failureMode.causes?.length || 0}</span>
+                          <span className="text-gray-600 dark:text-slate-400">Causes:</span>
+                          <span className="font-medium text-gray-900 dark:text-slate-100">{failureMode.causes?.length || 0}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Effects:</span>
-                          <span className="font-medium text-gray-900">{failureMode.effects?.length || 0}</span>
+                          <span className="text-gray-600 dark:text-slate-400">Effects:</span>
+                          <span className="font-medium text-gray-900 dark:text-slate-100">{failureMode.effects?.length || 0}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Controls:</span>
-                          <span className="font-medium text-gray-900">{failureMode.controls?.length || 0}</span>
+                          <span className="text-gray-600 dark:text-slate-400">Controls:</span>
+                          <span className="font-medium text-gray-900 dark:text-slate-100">{failureMode.controls?.length || 0}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Actions:</span>
-                          <span className="font-medium text-gray-900">{failureMode.actions?.length || 0}</span>
+                          <span className="text-gray-600 dark:text-slate-400">Actions:</span>
+                          <span className="font-medium text-gray-900 dark:text-slate-100">{failureMode.actions?.length || 0}</span>
                         </div>
                       </div>
 
-                      <div className="mt-4 pt-3 border-t border-gray-100 flex gap-2">
+                      <div className="mt-4 pt-3 border-t border-gray-100 dark:border-slate-700 flex gap-2">
                         <button
                           onClick={() => handleRowClick(failureMode)}
-                          className="flex-1 text-center text-primary-600 hover:text-primary-700 text-sm font-medium hover:bg-primary-50 py-2 rounded-md transition-colors"
+                          className="flex-1 text-center text-primary-600 dark:text-amber-500 hover:text-primary-700 dark:hover:text-amber-400 text-sm font-medium hover:bg-primary-50 dark:hover:bg-slate-700 py-2 rounded-md transition-colors"
                         >
                           View Details →
                         </button>
@@ -375,7 +325,7 @@ export default function FMEABuilder({ project }: FMEABuilderProps) {
                             e.stopPropagation();
                             handleDeleteFailureMode(failureMode.id);
                           }}
-                          className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
+                          className="p-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
                           title="Delete failure mode"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -410,16 +360,6 @@ export default function FMEABuilder({ project }: FMEABuilderProps) {
           </div>
         )}
       </div>
-
-      {/* Export Modal */}
-      <ExportModal
-        isOpen={showExportModal}
-        onClose={() => setShowExportModal(false)}
-        project={project}
-        failureModes={failureModes}
-        metrics={dashboardMetrics}
-        chartData={dashboardChartData}
-      />
     </div>
   );
 }

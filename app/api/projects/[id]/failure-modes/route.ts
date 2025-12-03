@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth, getUserFromToken } from '@/lib/auth';
-import { queries } from '@/lib/database-simple';
-import { APIResponse } from '@/types';
+import { readDatabase, writeDatabase } from '@/lib/database-simple';
+import { APIResponse, FailureMode, Cause, Effect, Control } from '@/types';
 import { randomUUID } from 'crypto';
 import { canViewProject, canEditProject } from '@/lib/permissions';
 
@@ -29,7 +29,8 @@ export async function GET(
       );
     }
 
-    const project = queries.getProjectById.get(projectId) as any;
+    const db = readDatabase();
+    const project = db.projects.find((p: any) => p.id === projectId);
     if (!project) {
       return NextResponse.json(
         { success: false, error: 'Project not found' } as APIResponse,
@@ -37,14 +38,14 @@ export async function GET(
       );
     }
 
-    const failureModes = queries.getFailureModesByProjectId.all(projectId);
+    const failureModes = db.failureModes.filter((fm: FailureMode) => fm.project_id === projectId);
 
     // Get related data for each failure mode
-    const failureModesWithDetails = failureModes.map((fm: any) => {
-        const causes = queries.getCausesByFailureModeId.all(fm.id);
-        const effects = queries.getEffectsByFailureModeId.all(fm.id);
-        const controls = queries.getControlsByFailureModeId.all(fm.id);
-        const actions = queries.getActionsByFailureModeId.all(fm.id);
+    const failureModesWithDetails = failureModes.map((fm: FailureMode) => {
+        const causes = db.causes.filter((c: any) => c.failure_mode_id === fm.id);
+        const effects = db.effects.filter((e: any) => e.failure_mode_id === fm.id);
+        const controls = db.controls.filter((c: any) => c.failure_mode_id === fm.id);
+        const actions = db.actions.filter((a: any) => a.failure_mode_id === fm.id);
 
         // Calculate RPN (Risk Priority Number)
         let maxRPN = 0;
@@ -133,7 +134,8 @@ export async function POST(
       );
     }
 
-    const project = queries.getProjectById.get(projectId) as any;
+    const db = readDatabase();
+    const project = db.projects.find((p: any) => p.id === projectId);
     if (!project) {
       return NextResponse.json(
         { success: false, error: 'Project not found' } as APIResponse,
@@ -153,23 +155,33 @@ export async function POST(
 
     // Create failure mode
     const failureModeId = randomUUID();
-    queries.createFailureMode.run(
-      failureModeId,
-      projectId,
-      processStep,
-      failureMode
-    );
+    const now = new Date().toISOString();
+
+    const newFailureMode: FailureMode = {
+      id: failureModeId,
+      project_id: projectId,
+      component_id: '', // Will be set later when components are added
+      process_step: processStep,
+      failure_mode: failureMode,
+      status: 'active',
+      created_at: now,
+      updated_at: now
+    };
+
+    db.failureModes.push(newFailureMode);
 
     // Create causes
     if (causes && Array.isArray(causes)) {
       for (const cause of causes) {
         if (cause.description && cause.occurrence) {
-          queries.createCause.run(
-            randomUUID(),
-            failureModeId,
-            cause.description,
-            cause.occurrence
-          );
+          db.causes.push({
+            id: randomUUID(),
+            failure_mode_id: failureModeId,
+            description: cause.description,
+            occurrence: cause.occurrence,
+            created_at: now,
+            updated_at: now
+          });
         }
       }
     }
@@ -178,43 +190,50 @@ export async function POST(
     if (effects && Array.isArray(effects)) {
       for (const effect of effects) {
         if (effect.description && effect.severity) {
-          queries.createEffect.run(
-            randomUUID(),
-            failureModeId,
-            effect.description,
-            effect.severity
-          );
+          db.effects.push({
+            id: randomUUID(),
+            failure_mode_id: failureModeId,
+            description: effect.description,
+            severity: effect.severity,
+            created_at: now,
+            updated_at: now
+          });
         }
       }
     }
+
+    writeDatabase(db);
 
     // Create controls
     if (controls && Array.isArray(controls)) {
       for (const control of controls) {
         if (control.description && control.type && control.detection) {
-          queries.createControl.run(
-            randomUUID(),
-            failureModeId,
-            control.type,
-            control.description,
-            control.detection,
-            control.effectiveness || 5
-          );
+          db.controls.push({
+            id: randomUUID(),
+            failure_mode_id: failureModeId,
+            type: control.type,
+            description: control.description,
+            detection: control.detection,
+            effectiveness: control.effectiveness || 5,
+            created_at: now,
+            updated_at: now
+          });
         }
       }
     }
 
+    writeDatabase(db);
+
     // Fetch the created failure mode with all details
-    const createdFailureMode = queries.getFailureModeById.get(failureModeId);
-    const createdCauses = queries.getCausesByFailureModeId.all(failureModeId);
-    const createdEffects = queries.getEffectsByFailureModeId.all(failureModeId);
-    const createdControls = queries.getControlsByFailureModeId.all(failureModeId);
+    const createdCauses = db.causes.filter((c: Cause) => c.failure_mode_id === failureModeId);
+    const createdEffects = db.effects.filter((e: Effect) => e.failure_mode_id === failureModeId);
+    const createdControls = db.controls.filter((c: Control) => c.failure_mode_id === failureModeId);
 
     return NextResponse.json(
       {
         success: true,
         data: {
-          ...createdFailureMode,
+          ...newFailureMode,
           causes: createdCauses,
           effects: createdEffects,
           controls: createdControls,

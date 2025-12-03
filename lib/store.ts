@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 import { AuthUser } from './auth';
-import { Project, FailureMode, AIConfig, Organization, OrganizationMember } from '@/types';
+import { Project, FailureMode, AIConfig, Organization, OrganizationMember, PlatformSettings } from '@/types';
 
 interface AuthState {
   user: AuthUser | null;
   token: string | null;
   isLoading: boolean;
+  isInitializing: boolean;
   login: (user: AuthUser, token: string) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
@@ -50,6 +51,7 @@ interface UIState {
   selectedFailureModeId: string | null;
   aiConfig: AIConfig;
   onboarding: OnboardingState;
+  currentView: 'tools' | 'projects' | 'workspace';
   setSidebarCollapsed: (collapsed: boolean) => void;
   setAiChatMinimized: (minimized: boolean) => void;
   setAiChatPosition: (position: { x: number; y: number }) => void;
@@ -59,6 +61,15 @@ interface UIState {
   setOnboardingStep: (step: number) => void;
   completeOnboarding: () => void;
   restartOnboarding: () => void;
+  setCurrentView: (view: 'tools' | 'projects' | 'workspace') => void;
+}
+
+interface PlatformSettingsState {
+  settings: PlatformSettings | null;
+  isLoading: boolean;
+  loadSettings: () => Promise<void>;
+  updateSettings: (updates: Partial<PlatformSettings>) => Promise<void>;
+  setSettings: (settings: PlatformSettings) => void;
 }
 
 // Auth Store
@@ -66,13 +77,14 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   token: null,
   isLoading: false,
+  isInitializing: true,
   login: (user, token) => {
     localStorage.setItem('auth-token', token);
-    set({ user, token });
+    set({ user, token, isInitializing: false });
   },
   logout: () => {
     localStorage.removeItem('auth-token');
-    set({ user: null, token: null });
+    set({ user: null, token: null, isInitializing: false });
   },
   setLoading: (isLoading) => set({ isLoading }),
 }));
@@ -141,23 +153,25 @@ export const useUIStore = create<UIState>((set) => ({
     currentStep: 0,
     hasCompletedOnboarding: false,
   },
+  currentView: 'tools',
   setSidebarCollapsed: (sidebarCollapsed) => set({ sidebarCollapsed }),
   setAiChatMinimized: (aiChatMinimized) => set({ aiChatMinimized }),
   setAiChatPosition: (aiChatPosition) => set({ aiChatPosition }),
   setSelectedFailureModeId: (selectedFailureModeId) => set({ selectedFailureModeId }),
   setAiConfig: (aiConfig) => set({ aiConfig }),
-  setOnboardingActive: (active) => set((state) => ({ 
-    onboarding: { ...state.onboarding, isActive: active } 
+  setOnboardingActive: (active) => set((state) => ({
+    onboarding: { ...state.onboarding, isActive: active }
   })),
-  setOnboardingStep: (step) => set((state) => ({ 
-    onboarding: { ...state.onboarding, currentStep: step } 
+  setOnboardingStep: (step) => set((state) => ({
+    onboarding: { ...state.onboarding, currentStep: step }
   })),
-  completeOnboarding: () => set((state) => ({ 
-    onboarding: { ...state.onboarding, isActive: false, hasCompletedOnboarding: true } 
+  completeOnboarding: () => set((state) => ({
+    onboarding: { ...state.onboarding, isActive: false, hasCompletedOnboarding: true }
   })),
-  restartOnboarding: () => set((state) => ({ 
-    onboarding: { ...state.onboarding, isActive: true, currentStep: 0 } 
+  restartOnboarding: () => set((state) => ({
+    onboarding: { ...state.onboarding, isActive: true, currentStep: 0 }
   })),
+  setCurrentView: (currentView) => set({ currentView }),
 }));
 
 // Initialize auth from localStorage
@@ -174,18 +188,129 @@ if (typeof window !== 'undefined') {
           useAuthStore.getState().login(data.data.user, token);
         } else {
           localStorage.removeItem('auth-token');
+          useAuthStore.setState({ isInitializing: false });
         }
       })
       .catch(() => {
         localStorage.removeItem('auth-token');
+        useAuthStore.setState({ isInitializing: false });
       });
+  } else {
+    // No token in localStorage, stop initializing
+    useAuthStore.setState({ isInitializing: false });
+  }
+}
+
+// Platform Settings Store
+export const usePlatformSettingsStore = create<PlatformSettingsState>((set, get) => ({
+  settings: null,
+  isLoading: false,
+  loadSettings: async () => {
+    set({ isLoading: true });
+    try {
+      const response = await fetch('/api/platform/settings');
+      const data = await response.json();
+      if (data.success && data.data) {
+        set({ settings: data.data, isLoading: false });
+        // Apply accent color to document
+        if (data.data.branding?.accentColor) {
+          applyAccentColor(
+            data.data.branding.accentColor,
+            data.data.branding.accentColorDark,
+            data.data.branding.accentColorHover || data.data.branding.accentColor,
+            data.data.branding.accentColorDarkHover || data.data.branding.accentColorDark
+          );
+        }
+      } else {
+        set({ isLoading: false });
+      }
+    } catch (error) {
+      console.error('Failed to load platform settings:', error);
+      set({ isLoading: false });
+    }
+  },
+  updateSettings: async (updates) => {
+    const currentSettings = get().settings;
+    if (!currentSettings) return;
+
+    set({ isLoading: true });
+    try {
+      const response = await fetch('/api/platform/settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('auth-token')}`,
+        },
+        body: JSON.stringify(updates),
+      });
+
+      const data = await response.json();
+      if (data.success && data.data) {
+        set({ settings: data.data, isLoading: false });
+        // Apply accent color immediately
+        if (data.data.branding?.accentColor) {
+          applyAccentColor(
+            data.data.branding.accentColor,
+            data.data.branding.accentColorDark,
+            data.data.branding.accentColorHover || data.data.branding.accentColor,
+            data.data.branding.accentColorDarkHover || data.data.branding.accentColorDark
+          );
+        }
+      } else {
+        set({ isLoading: false });
+        throw new Error(data.error || 'Failed to update settings');
+      }
+    } catch (error) {
+      console.error('Failed to update platform settings:', error);
+      set({ isLoading: false });
+      throw error;
+    }
+  },
+  setSettings: (settings) => set({ settings }),
+}));
+
+// Helper function to apply accent color
+function applyAccentColor(
+  lightColor: string,
+  darkColor: string,
+  lightHover: string,
+  darkHover: string
+) {
+  const root = document.documentElement;
+
+  // Convert hex to RGB
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
+  };
+
+  const lightRgb = hexToRgb(lightColor);
+  const darkRgb = hexToRgb(darkColor);
+  const lightHoverRgb = hexToRgb(lightHover);
+  const darkHoverRgb = hexToRgb(darkHover);
+
+  if (lightRgb) {
+    root.style.setProperty('--accent-light', `${lightRgb.r} ${lightRgb.g} ${lightRgb.b}`);
+  }
+  if (darkRgb) {
+    root.style.setProperty('--accent-dark', `${darkRgb.r} ${darkRgb.g} ${darkRgb.b}`);
+  }
+  if (lightHoverRgb) {
+    root.style.setProperty('--accent-hover-light', `${lightHoverRgb.r} ${lightHoverRgb.g} ${lightHoverRgb.b}`);
+  }
+  if (darkHoverRgb) {
+    root.style.setProperty('--accent-hover-dark', `${darkHoverRgb.r} ${darkHoverRgb.g} ${darkHoverRgb.b}`);
   }
 }
 
 // Utility functions
 export const useAuth = () => {
-  const { user, token, isLoading, login, logout, setLoading } = useAuthStore();
-  return { user, token, isLoading, login, logout, setLoading };
+  const { user, token, isLoading, isInitializing, login, logout, setLoading } = useAuthStore();
+  return { user, token, isLoading, isInitializing, login, logout, setLoading };
 };
 
 export const useOrganization = () => {
@@ -250,6 +375,7 @@ export const useUI = () => {
     selectedFailureModeId,
     aiConfig,
     onboarding,
+    currentView,
     setSidebarCollapsed,
     setAiChatMinimized,
     setAiChatPosition,
@@ -259,6 +385,7 @@ export const useUI = () => {
     setOnboardingStep,
     completeOnboarding,
     restartOnboarding,
+    setCurrentView,
   } = useUIStore();
 
   return {
@@ -268,6 +395,7 @@ export const useUI = () => {
     selectedFailureModeId,
     aiConfig,
     onboarding,
+    currentView,
     setSidebarCollapsed,
     setAiChatMinimized,
     setAiChatPosition,
@@ -277,5 +405,11 @@ export const useUI = () => {
     setOnboardingStep,
     completeOnboarding,
     restartOnboarding,
+    setCurrentView,
   };
+};
+
+export const usePlatformSettings = () => {
+  const { settings, isLoading, loadSettings, updateSettings, setSettings } = usePlatformSettingsStore();
+  return { settings, isLoading, loadSettings, updateSettings, setSettings };
 };

@@ -2,12 +2,27 @@
 import jsPDF from 'jspdf';
 import * as XLSX from 'xlsx';
 import { Project, FailureMode, DashboardMetrics, ChartData, Component } from '@/types';
+import {
+  generateHeatMapChart,
+  generateBubbleChart,
+  generateTopRisksChart,
+  generateRiskDistributionChart,
+  generateParetoChart,
+  generateTopMitigationsChart,
+  generateActionStatusChart,
+} from './chart-generator';
 
-// Chart Images type
+// Chart Images type (deprecated - keeping for compatibility)
 export interface ChartImages {
   heatMap?: string;
   pareto?: string;
   bubble?: string;
+  topRisks?: string;
+  riskDistribution?: string;
+  topMitigations?: string;
+  effectsWithoutControl?: string;
+  actionStatus?: string;
+  metricsToolbar?: string;
 }
 
 // Additional export options
@@ -20,14 +35,14 @@ export interface ExportMetadata {
   completionRate?: number;
 }
 
-// Export to PDF (matches preview pane layout exactly)
-export function exportToPDF(
+// Export to PDF - now generates charts from data instead of screen captures
+export async function exportToPDF(
   project: Project,
   failureModes: FailureMode[],
   metrics?: DashboardMetrics,
   chartData?: ChartData,
   components?: Component[],
-  chartImages?: ChartImages,
+  chartImages?: ChartImages, // Deprecated parameter - kept for compatibility
   exportMetadata?: ExportMetadata
 ) {
   // Start with portrait for summary pages
@@ -295,82 +310,211 @@ export function exportToPDF(
   });
 
   // --- DASHBOARD CHARTS SECTION ---
-  if (chartImages && (chartImages.heatMap || chartImages.pareto || chartImages.bubble)) {
-    // Check if we need a new page
-    if (y > pageHeight - 100) {
-      doc.addPage();
-      y = 20;
-    } else {
-      y += 10;
-    }
+  // Generate charts from data and add them to PDF
+  console.log('=== CHART GENERATION DEBUG ===');
+  console.log('Components:', components?.length || 0);
+  console.log('Failure Modes:', failureModes?.length || 0);
+  console.log('First component:', components?.[0] ? { id: components[0].id, name: components[0].name, hasFailureModes: !!components[0].failureModes } : 'none');
 
-    // Title
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(...colors.gray900);
-    doc.text('Dashboard Charts', 20, y);
-    y += 8;
+  if (components && components.length > 0 && failureModes.length > 0) {
+    console.log('✓ Starting chart generation...');
+    try {
+      // Heat Map - Portrait
+      console.log('Generating heat map chart...');
+      const heatMapBuffer = await generateHeatMapChart(components, failureModes);
+      console.log('✓ Heat map generated, buffer size:', heatMapBuffer.length);
 
-    // Calculate dimensions for 3 charts in a row
-    const chartWidth = (pageWidth - 50) / 3; // Space for 3 charts with gaps
-    const chartHeight = chartWidth * 0.6; // Maintain aspect ratio
-    const chartSpacing = 5;
-
-    // Ensure charts fit on page, otherwise add new page
-    if (y + chartHeight > pageHeight - 20) {
-      doc.addPage();
-      y = 20;
-    }
-
-    let chartX = 20;
-
-    // HeatMap Chart
-    if (chartImages.heatMap) {
+      doc.addPage('portrait');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(...colors.gray900);
+      doc.text('Heat Map', 20, 20);
+      doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
       doc.setTextColor(...colors.gray700);
-      doc.text('RPN Heatmap', chartX, y);
+      doc.text('Component failure modes by risk level', 20, 27);
 
-      try {
-        doc.addImage(chartImages.heatMap, 'PNG', chartX, y + 3, chartWidth - chartSpacing, chartHeight);
-      } catch (e) {
-        console.error('Failed to add heatmap image:', e);
+      const heatMapImage = `data:image/png;base64,${heatMapBuffer.toString('base64')}`;
+      // Calculate dimensions to maintain aspect ratio (1200x800 = 3:2)
+      const chartAspectRatio = 1200 / 800; // 1.5
+      const availableWidth = pageWidth - 40;
+      const availableHeight = pageHeight - 70;
+      let imgWidth = availableWidth;
+      let imgHeight = imgWidth / chartAspectRatio;
+
+      // If height exceeds available space, scale by height instead
+      if (imgHeight > availableHeight) {
+        imgHeight = availableHeight;
+        imgWidth = imgHeight * chartAspectRatio;
       }
 
-      chartX += chartWidth;
-    }
+      // Center the image
+      const imgX = 20 + (availableWidth - imgWidth) / 2;
+      doc.addImage(heatMapImage, 'PNG', imgX, 35, imgWidth, imgHeight);
+      console.log('✓ Heat map added to PDF');
 
-    // Pareto Chart
-    if (chartImages.pareto) {
+      // Risk Bubble Chart - Portrait
+      const bubbleBuffer = await generateBubbleChart(failureModes);
+      doc.addPage('portrait');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(...colors.gray900);
+      doc.text('Risk Bubble Chart', 20, 20);
+      doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
       doc.setTextColor(...colors.gray700);
-      doc.text('Top Risks (Pareto)', chartX, y);
+      doc.text('Severity vs Occurrence with RPN magnitude', 20, 27);
 
-      try {
-        doc.addImage(chartImages.pareto, 'PNG', chartX, y + 3, chartWidth - chartSpacing, chartHeight);
-      } catch (e) {
-        console.error('Failed to add pareto image:', e);
+      const bubbleImage = `data:image/png;base64,${bubbleBuffer.toString('base64')}`;
+      // Recalculate for new page
+      imgWidth = availableWidth;
+      imgHeight = imgWidth / chartAspectRatio;
+      if (imgHeight > availableHeight) {
+        imgHeight = availableHeight;
+        imgWidth = imgHeight * chartAspectRatio;
+      }
+      const bubbleImgX = 20 + (availableWidth - imgWidth) / 2;
+      doc.addImage(bubbleImage, 'PNG', bubbleImgX, 35, imgWidth, imgHeight);
+
+      // Top Risks Chart - Landscape (if chartData available)
+      if (chartData && chartData.topRisks && chartData.topRisks.length > 0) {
+        const topRisksBuffer = await generateTopRisksChart(chartData.topRisks);
+        doc.addPage('landscape');
+        const landscapeWidth = doc.internal.pageSize.width;
+        const landscapeHeight = doc.internal.pageSize.height;
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.setTextColor(...colors.gray900);
+        doc.text('Top 10 Risks', 20, 20);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...colors.gray700);
+        doc.text('Highest RPN failure modes', 20, 27);
+
+        const topRisksImage = `data:image/png;base64,${topRisksBuffer.toString('base64')}`;
+        // Calculate for landscape orientation
+        const lAvailableWidth = landscapeWidth - 40;
+        const lAvailableHeight = landscapeHeight - 70;
+        let lImgWidth = lAvailableWidth;
+        let lImgHeight = lImgWidth / chartAspectRatio;
+        if (lImgHeight > lAvailableHeight) {
+          lImgHeight = lAvailableHeight;
+          lImgWidth = lImgHeight * chartAspectRatio;
+        }
+        const topRisksImgX = 20 + (lAvailableWidth - lImgWidth) / 2;
+        doc.addImage(topRisksImage, 'PNG', topRisksImgX, 35, lImgWidth, lImgHeight);
       }
 
-      chartX += chartWidth;
-    }
-
-    // Bubble Chart
-    if (chartImages.bubble) {
+      // Risk Distribution - Portrait
+      const riskDistBuffer = await generateRiskDistributionChart(failureModes);
+      doc.addPage('portrait');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(...colors.gray900);
+      doc.text('Risk Distribution', 20, 20);
+      doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
       doc.setTextColor(...colors.gray700);
-      doc.text('Risk Bubble Chart', chartX, y);
+      doc.text('Severity, Occurrence, and Detection distributions', 20, 27);
 
-      try {
-        doc.addImage(chartImages.bubble, 'PNG', chartX, y + 3, chartWidth - chartSpacing, chartHeight);
-      } catch (e) {
-        console.error('Failed to add bubble image:', e);
+      const riskDistImage = `data:image/png;base64,${riskDistBuffer.toString('base64')}`;
+      // Recalculate for new portrait page
+      imgWidth = availableWidth;
+      imgHeight = imgWidth / chartAspectRatio;
+      if (imgHeight > availableHeight) {
+        imgHeight = availableHeight;
+        imgWidth = imgHeight * chartAspectRatio;
       }
-    }
+      const riskDistImgX = 20 + (availableWidth - imgWidth) / 2;
+      doc.addImage(riskDistImage, 'PNG', riskDistImgX, 35, imgWidth, imgHeight);
 
-    y += chartHeight + 10;
+      // Pareto Chart - Landscape
+      const paretoBuffer = await generateParetoChart(failureModes);
+      doc.addPage('landscape');
+      const landscapeWidth = doc.internal.pageSize.width;
+      const landscapeHeight = doc.internal.pageSize.height;
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(...colors.gray900);
+      doc.text('Pareto Analysis', 20, 20);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...colors.gray700);
+      doc.text('Cumulative risk contribution by failure mode', 20, 27);
+
+      const paretoImage = `data:image/png;base64,${paretoBuffer.toString('base64')}`;
+      // Calculate for landscape orientation
+      let pAvailableWidth = landscapeWidth - 40;
+      let pAvailableHeight = landscapeHeight - 70;
+      let pImgWidth = pAvailableWidth;
+      let pImgHeight = pImgWidth / chartAspectRatio;
+      if (pImgHeight > pAvailableHeight) {
+        pImgHeight = pAvailableHeight;
+        pImgWidth = pImgHeight * chartAspectRatio;
+      }
+      const paretoImgX = 20 + (pAvailableWidth - pImgWidth) / 2;
+      doc.addImage(paretoImage, 'PNG', paretoImgX, 35, pImgWidth, pImgHeight);
+
+      // Top Mitigations - Landscape
+      const mitigationsBuffer = await generateTopMitigationsChart(failureModes);
+      doc.addPage('landscape');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(...colors.gray900);
+      doc.text('Top-Performing Mitigations', 20, 20);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...colors.gray700);
+      doc.text('Actions with highest RPN reduction', 20, 27);
+
+      const mitigationsImage = `data:image/png;base64,${mitigationsBuffer.toString('base64')}`;
+      // Calculate for landscape orientation
+      let mAvailableWidth = landscapeWidth - 40;
+      let mAvailableHeight = landscapeHeight - 70;
+      let mImgWidth = mAvailableWidth;
+      let mImgHeight = mImgWidth / chartAspectRatio;
+      if (mImgHeight > mAvailableHeight) {
+        mImgHeight = mAvailableHeight;
+        mImgWidth = mImgHeight * chartAspectRatio;
+      }
+      const mitigationsImgX = 20 + (mAvailableWidth - mImgWidth) / 2;
+      doc.addImage(mitigationsImage, 'PNG', mitigationsImgX, 35, mImgWidth, mImgHeight);
+
+      // Action Status - Portrait (if chartData available)
+      if (chartData && chartData.actionStatus && chartData.actionStatus.length > 0) {
+        const actionStatusBuffer = await generateActionStatusChart(chartData.actionStatus);
+        doc.addPage('portrait');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.setTextColor(...colors.gray900);
+        doc.text('Action Status Distribution', 20, 20);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...colors.gray700);
+        doc.text('Current status of mitigation actions', 20, 27);
+
+        const actionStatusImage = `data:image/png;base64,${actionStatusBuffer.toString('base64')}`;
+        // Recalculate for new portrait page
+        imgWidth = availableWidth;
+        imgHeight = imgWidth / chartAspectRatio;
+        if (imgHeight > availableHeight) {
+          imgHeight = availableHeight;
+          imgWidth = imgHeight * chartAspectRatio;
+        }
+        const actionStatusImgX = 20 + (availableWidth - imgWidth) / 2;
+        doc.addImage(actionStatusImage, 'PNG', actionStatusImgX, 35, imgWidth, imgHeight);
+      }
+      console.log('✓ All charts generated successfully');
+    } catch (error) {
+      console.error('✗ Failed to generate charts:', error);
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      // Continue with PDF generation without charts
+    }
+  } else {
+    console.log('✗ Skipping chart generation - conditions not met');
   }
 
   // Helper function to add footer to any page
@@ -586,11 +730,18 @@ export function exportToPDF(
     addFooter(portraitY, pageWidth);
   }
 
-  // Generate filename
-  const filename = `FMEA_${project.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
-
-  // Save the PDF
-  doc.save(filename);
+  // Return the PDF document for server-side or client-side handling
+  // When called from API route, the route will extract the buffer
+  // When called from client, it will save directly
+  if (typeof window === 'undefined') {
+    // Server-side: return doc for API route to handle
+    return doc;
+  } else {
+    // Client-side: save directly (legacy support)
+    const filename = `FMEA_${project.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(filename);
+    return doc;
+  }
 }
 
 // Export to Excel

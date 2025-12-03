@@ -147,9 +147,9 @@ export default function HeatMapChart({ components, onFilterClick }: HeatMapChart
         )}
       </div>
 
-      {components.length > 8 && (
+      {components.length > 4 && (
         <div className="mt-4 text-center text-xs text-gray-500 dark:text-slate-400">
-          Showing top 8 of {components.length} components
+          Showing top 4 of {components.length} components
         </div>
       )}
     </div>

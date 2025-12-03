@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/store';
 import { isSuperAdmin } from '@/lib/permissions-client';
-import { ArrowLeft, Users, Search } from 'lucide-react';
+import { Users, Search } from 'lucide-react';
 import { readDatabase } from '@/lib/database-simple';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import toast from 'react-hot-toast';
 
 export default function AdminUsersPage() {
@@ -61,42 +62,24 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => router.push('/admin')}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
-            </button>
-            <div>
-              <h1 className="text-xl font-semibold text-gray-900">Manage Users</h1>
-              <p className="text-sm text-gray-600">All users across all organizations</p>
-            </div>
-          </div>
-
-          {/* Search */}
-          <div className="relative w-80">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search users..."
-              className="w-full pl-10 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-monday-purple"
-            />
-          </div>
+    <DashboardLayout>
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+        {/* Search Bar */}
+        <div className="relative w-80">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search users..."
+            className="w-full pl-10 px-4 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-gray-900 dark:text-slate-100 placeholder:text-gray-500 dark:placeholder:text-slate-400"
+          />
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h2 className="font-semibold text-gray-900">
+        {/* Users List */}
+        <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-700">
+            <h2 className="font-semibold text-gray-900 dark:text-slate-100">
               All Users ({filteredUsers.length})
             </h2>
           </div>
@@ -104,33 +87,33 @@ export default function AdminUsersPage() {
           {loading ? (
             <div className="p-12 text-center">
               <div className="spinner mx-auto mb-4" />
-              <p className="text-gray-500">Loading users...</p>
+              <p className="text-gray-500 dark:text-slate-400">Loading users...</p>
             </div>
           ) : filteredUsers.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-              <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+            <div className="p-12 text-center text-gray-500 dark:text-slate-400">
+              <Users className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-slate-600" />
               <p>No users found</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-gray-200 dark:divide-slate-700">
               {filteredUsers.map((u) => (
-                <div key={u.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
+                <div key={u.id} className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-gradient-to-br from-monday-purple to-monday-softPurple rounded-full flex items-center justify-center text-white font-semibold">
+                      <div className="w-10 h-10 bg-accent/10 dark:bg-accent/20 rounded-full flex items-center justify-center text-accent font-semibold">
                         {u.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
                         <div className="flex items-center space-x-2">
-                          <div className="font-medium text-gray-900">{u.name}</div>
+                          <div className="font-medium text-gray-900 dark:text-slate-100">{u.name}</div>
                           {u.is_superadmin && (
-                            <span className="px-2 py-0.5 bg-monday-purple text-white text-xs rounded-full font-medium">
+                            <span className="px-2 py-0.5 bg-accent text-white text-xs rounded-full font-medium">
                               Superadmin
                             </span>
                           )}
                         </div>
-                        <div className="text-sm text-gray-600">{u.email}</div>
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-sm text-gray-600 dark:text-slate-400">{u.email}</div>
+                        <div className="text-xs text-gray-500 dark:text-slate-500 mt-1">
                           Joined {new Date(u.created_at).toLocaleDateString()}
                         </div>
                       </div>
@@ -142,6 +125,6 @@ export default function AdminUsersPage() {
           )}
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

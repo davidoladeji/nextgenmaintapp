@@ -14,15 +14,14 @@ import RiskDistributionChart from './RiskDistributionChart';
 import TopRisksChart from './TopRisksChart';
 import ActionStatusChart from './ActionStatusChart';
 import RPNHeatmapChart from './RPNHeatmapChart';
-import { BarChart3, RefreshCw, Download } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface DashboardOverviewProps {
   project: Project;
-  onExport?: () => void;
 }
 
-export default function DashboardOverview({ project, onExport }: DashboardOverviewProps) {
+export default function DashboardOverview({ project }: DashboardOverviewProps) {
   const { token } = useAuth();
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [chartData, setChartData] = useState<ChartData | null>(null);
@@ -88,11 +87,11 @@ export default function DashboardOverview({ project, onExport }: DashboardOvervi
       <div className="p-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100 flex items-center">
               <BarChart3 className="w-8 h-8 mr-3" />
               Dashboard Overview
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-gray-600 dark:text-slate-400 mt-1">
               Analytics and insights for {project.name}
             </p>
           </div>
@@ -101,7 +100,7 @@ export default function DashboardOverview({ project, onExport }: DashboardOvervi
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="spinner mb-4 mx-auto" />
-            <p className="text-gray-600">Loading dashboard data...</p>
+            <p className="text-gray-600 dark:text-slate-400">Loading dashboard data...</p>
           </div>
         </div>
       </div>
@@ -113,24 +112,17 @@ export default function DashboardOverview({ project, onExport }: DashboardOvervi
       <div className="p-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100 flex items-center">
               <BarChart3 className="w-8 h-8 mr-3" />
               Dashboard Overview
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-gray-600 dark:text-slate-400 mt-1">
               Analytics and insights for {project.name}
             </p>
           </div>
-          <button
-            onClick={loadDashboardData}
-            className="btn-secondary"
-          >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh Data
-          </button>
         </div>
-        
-        <div className="flex items-center justify-center h-64 text-gray-500">
+
+        <div className="flex items-center justify-center h-64 text-gray-500 dark:text-slate-400">
           Failed to load dashboard data
         </div>
       </div>
@@ -275,7 +267,7 @@ export default function DashboardOverview({ project, onExport }: DashboardOvervi
   const enhancedMetrics = calculateEnhancedMetrics(filteredFailureModes, filteredComponents);
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 dark:bg-slate-900 min-h-screen">
       {/* Enhanced Metrics Toolbar */}
       <MetricsToolbar
         {...enhancedMetrics}
@@ -290,59 +282,41 @@ export default function DashboardOverview({ project, onExport }: DashboardOvervi
         {/* Header with Actions */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100 flex items-center">
               <BarChart3 className="w-8 h-8 mr-3" />
               Dashboard Overview
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-gray-600 dark:text-slate-400 mt-1">
               Analytics and insights for {project.name}
             </p>
-          </div>
-          <div className="flex items-center space-x-2">
-            {onExport && (
-              <button
-                onClick={onExport}
-                className="btn-secondary"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Export
-              </button>
-            )}
-            <button
-              onClick={loadDashboardData}
-              className="btn-secondary"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Refresh Data
-            </button>
           </div>
         </div>
 
         {/* Active Filters Display */}
         {(selectedComponents.length > 0 || selectedFailureModes.length > 0 || clickedElement) && (
-          <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="mb-4 p-4 bg-accent/10 border border-accent rounded-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium text-blue-900">Active Filters:</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-slate-100">Active Filters:</span>
                 {clickedElement && (
-                  <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                  <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm font-medium">
                     {clickedElement.type === 'component' ? 'Component Selected' : 'Failure Mode Selected'}
                   </span>
                 )}
                 {selectedComponents.length > 0 && (
-                  <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                  <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm">
                     {selectedComponents.length} Component{selectedComponents.length > 1 ? 's' : ''}
                   </span>
                 )}
                 {selectedFailureModes.length > 0 && (
-                  <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                  <span className="px-3 py-1 bg-accent/20 text-accent rounded-full text-sm">
                     {selectedFailureModes.length} Failure Mode{selectedFailureModes.length > 1 ? 's' : ''}
                   </span>
                 )}
               </div>
               <button
                 onClick={handleClearFilters}
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                className="text-sm text-accent hover:text-accent font-medium"
               >
                 Clear All Filters
               </button>
@@ -370,8 +344,29 @@ export default function DashboardOverview({ project, onExport }: DashboardOvervi
               data={chartData?.topRisks || []}
               onBarClick={handleTopRiskClick}
             />
-            <div className="grid grid-cols-3 gap-4">
-              <RiskDistributionChart data={chartData?.riskDistribution || []} />
+            {/* Single card containing all three donut charts */}
+            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Risk Distribution</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <RiskDistributionChart
+                  type="severity"
+                  failureModes={filteredFailureModes}
+                  title="Severity"
+                  inline
+                />
+                <RiskDistributionChart
+                  type="occurrence"
+                  failureModes={filteredFailureModes}
+                  title="Occurrence"
+                  inline
+                />
+                <RiskDistributionChart
+                  type="detection"
+                  failureModes={filteredFailureModes}
+                  title="Detection"
+                  inline
+                />
+              </div>
             </div>
           </div>
 
@@ -396,28 +391,28 @@ export default function DashboardOverview({ project, onExport }: DashboardOvervi
 
         {/* Summary Insights */}
         {metrics && metrics.totalFailureModes > 0 && (
-          <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-blue-900 mb-3 flex items-center">
+          <div className="mt-8 bg-accent/10 border border-accent rounded-lg p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-3 flex items-center">
               <span className="mr-2">💡</span>
               Key Insights
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-              <div className="text-blue-800">
+              <div className="text-gray-700 dark:text-slate-300">
                 <strong>{Math.round((metrics.highRiskModes / metrics.totalFailureModes) * 100)}%</strong> of failure modes are high risk (RPN ≥ 200)
               </div>
-              <div className="text-blue-800">
+              <div className="text-gray-700 dark:text-slate-300">
                 <strong>{Math.round((metrics.completedActions / Math.max(metrics.completedActions + metrics.openActions, 1)) * 100)}%</strong> of actions have been completed
               </div>
-              <div className="text-blue-800">
+              <div className="text-gray-700 dark:text-slate-300">
                 Average RPN is <strong>{metrics.averageRPN}</strong> across all failure modes
               </div>
-              <div className="text-blue-800">
+              <div className="text-gray-700 dark:text-slate-300">
                 <strong>{components.length}</strong> components analyzed with <strong>{failureModes.length}</strong> failure modes
               </div>
-              <div className="text-blue-800">
+              <div className="text-gray-700 dark:text-slate-300">
                 Highest RPN: <strong className="text-red-600">{enhancedMetrics.highestRPN}</strong>
               </div>
-              <div className="text-blue-800">
+              <div className="text-gray-700 dark:text-slate-300">
                 <strong>{enhancedMetrics.mitigationsClosedPercent}%</strong> of mitigations completed
               </div>
             </div>

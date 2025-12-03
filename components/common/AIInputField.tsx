@@ -11,7 +11,7 @@ interface AIInputFieldProps {
   className?: string;
   type?: 'text' | 'textarea';
   aiContext?: {
-    type: 'cause' | 'effect' | 'control' | 'action' | 'processStep' | 'failureMode';
+    type: 'cause' | 'effect' | 'control' | 'action' | 'processStep' | 'failureMode' | 'component';
     asset?: any;
     failureMode?: any;
     processStep?: string;
@@ -44,35 +44,64 @@ export default function AIInputField({
 
     setAiLoading(true);
     try {
-      const response = await fetch('/api/ai/suggest', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          type: aiContext.type === 'cause' ? 'causes' :
-                aiContext.type === 'effect' ? 'effects' :
-                aiContext.type === 'control' ? 'controls' :
-                aiContext.type === 'action' ? 'actions' :
-                'general',
-          context: {
-            asset: aiContext.asset,
-            failureMode: aiContext.failureMode,
-            processStep: aiContext.processStep,
-            cause: aiContext.cause,
-            effect: aiContext.effect,
+      // For component/failureMode/processStep/effect types, use the duplicate endpoint for single name generation
+      if (['component', 'failureMode', 'processStep', 'effect'].includes(aiContext.type)) {
+        const response = await fetch('/api/ai/duplicate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
-        }),
-      });
+          body: JSON.stringify({
+            type: aiContext.type === 'component' ? 'component' :
+                  aiContext.type === 'failureMode' ? 'failureMode' : 'effect',
+            originalName: value || 'New Item',
+            context: {
+              componentName: aiContext.asset?.name,
+              failureModeName: aiContext.failureMode?.failure_mode || aiContext.failureMode?.name,
+            },
+          }),
+        });
 
-      const result = await response.json();
-      if (result.success && result.data.suggestions?.length > 0) {
-        // Use the first suggestion
-        onChange(result.data.suggestions[0].text);
-        toast.success('AI suggestion applied!');
+        const result = await response.json();
+        if (result.success && result.data?.name) {
+          onChange(result.data.name);
+          toast.success('AI suggestion applied!');
+        } else {
+          throw new Error(result.error || 'No suggestions available');
+        }
       } else {
-        throw new Error(result.error || 'No suggestions available');
+        // For cause/effect/control types, use the existing bulk suggestion endpoint
+        const response = await fetch('/api/ai/suggest', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            type: aiContext.type === 'cause' ? 'causes' :
+                  aiContext.type === 'effect' ? 'effects' :
+                  aiContext.type === 'control' ? 'controls' :
+                  aiContext.type === 'action' ? 'actions' :
+                  'general',
+            context: {
+              asset: aiContext.asset,
+              failureMode: aiContext.failureMode,
+              processStep: aiContext.processStep,
+              cause: aiContext.cause,
+              effect: aiContext.effect,
+            },
+          }),
+        });
+
+        const result = await response.json();
+        if (result.success && result.data.suggestions?.length > 0) {
+          // Use the first suggestion
+          onChange(result.data.suggestions[0].text);
+          toast.success('AI suggestion applied!');
+        } else {
+          throw new Error(result.error || 'No suggestions available');
+        }
       }
     } catch (error) {
       toast.error('AI suggestions temporarily unavailable');

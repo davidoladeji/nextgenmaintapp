@@ -171,7 +171,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-monday-paleBlue via-white to-monday-lightPurple flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center p-4">
       <div className="max-w-2xl w-full">
         {/* Progress Indicator */}
         <div className="mb-8">
@@ -181,10 +181,10 @@ export default function OnboardingPage() {
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
                     s < step
-                      ? 'bg-monday-teal text-white'
+                      ? 'bg-accent text-white'
                       : s === step
-                      ? 'bg-monday-purple text-white'
-                      : 'bg-gray-200 text-gray-500'
+                      ? 'bg-accent text-white'
+                      : 'bg-gray-200 dark:bg-slate-700 text-gray-500 dark:text-slate-400'
                   }`}
                 >
                   {s < step ? <CheckCircle className="w-5 h-5" /> : s}
@@ -192,7 +192,7 @@ export default function OnboardingPage() {
                 {s < 3 && (
                   <div
                     className={`w-16 h-1 mx-2 ${
-                      s < step ? 'bg-monday-teal' : 'bg-gray-200'
+                      s < step ? 'bg-accent' : 'bg-gray-200 dark:bg-slate-700'
                     }`}
                   />
                 )}
@@ -202,21 +202,21 @@ export default function OnboardingPage() {
         </div>
 
         {/* Step Content */}
-        <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl overflow-hidden border border-gray-200 dark:border-slate-700">
           {/* Step 1: Create Organization */}
           {step === 1 && (
             <div>
-              <div className="bg-gradient-to-r from-monday-purple to-monday-softPurple px-8 py-6 text-white">
+              <div className="bg-accent/10 dark:bg-accent/20 px-8 py-6 border-b border-gray-200 dark:border-slate-700">
                 <div className="flex items-center space-x-3 mb-2">
-                  <Building className="w-8 h-8" />
-                  <h1 className="text-2xl font-bold">Welcome to NextGenMaint!</h1>
+                  <Building className="w-8 h-8 text-accent" />
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Welcome to NextGenMaint!</h1>
                 </div>
-                <p className="text-white/90">Let's set up your organization to get started</p>
+                <p className="text-gray-600 dark:text-slate-400">Let's set up your organization to get started</p>
               </div>
 
               <div className="p-8 space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                  <label className="block text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">
                     Organization Name *
                   </label>
                   <input
@@ -224,34 +224,34 @@ export default function OnboardingPage() {
                     value={orgName}
                     onChange={(e) => handleOrgNameChange(e.target.value)}
                     placeholder="e.g., Acme Mining Corp"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-monday-purple text-lg"
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-lg text-gray-900 dark:text-slate-100 placeholder:text-gray-500 dark:placeholder:text-slate-400"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                  <label className="block text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">
                     URL Identifier
                   </label>
                   <div className="flex items-center space-x-2">
-                    <span className="text-gray-500">nextgenmaint.com/</span>
+                    <span className="text-gray-500 dark:text-slate-400">nextgenmaint.com/</span>
                     <input
                       type="text"
                       value={orgSlug}
                       onChange={(e) => setOrgSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
                       placeholder="acme-mining"
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-monday-purple font-mono"
+                      className="flex-1 px-4 py-3 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent font-mono text-gray-900 dark:text-slate-100 placeholder:text-gray-500 dark:placeholder:text-slate-400"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                  <label className="block text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">
                     Industry
                   </label>
                   <select
                     value={industry}
                     onChange={(e) => setIndustry(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-monday-purple"
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-gray-900 dark:text-slate-100"
                   >
                     <option value="">Select industry...</option>
                     <option value="mining">Mining</option>
@@ -265,7 +265,7 @@ export default function OnboardingPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                  <label className="block text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">
                     Team Size
                   </label>
                   <div className="grid grid-cols-2 gap-3">
@@ -281,12 +281,12 @@ export default function OnboardingPage() {
                         onClick={() => setTeamSize(option.value)}
                         className={`p-4 rounded-lg border-2 transition-all text-left ${
                           teamSize === option.value
-                            ? 'border-monday-purple bg-monday-lightPurple'
-                            : 'border-gray-200 hover:border-gray-300'
+                            ? 'border-accent bg-accent/10 dark:bg-accent/20'
+                            : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500'
                         }`}
                       >
-                        <div className="font-medium text-gray-900">{option.label}</div>
-                        <div className="text-xs text-gray-600 mt-1">{option.plan} Plan</div>
+                        <div className="font-medium text-gray-900 dark:text-slate-100">{option.label}</div>
+                        <div className="text-xs text-gray-600 dark:text-slate-400 mt-1">{option.plan} Plan</div>
                       </button>
                     ))}
                   </div>
@@ -295,7 +295,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={handleCreateOrganization}
                   disabled={loading || !orgName.trim() || !orgSlug.trim()}
-                  className="w-full py-3 bg-gradient-to-r from-monday-purple to-monday-softPurple text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-3 bg-accent text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Creating...' : 'Create Organization'}
                 </button>
@@ -306,12 +306,12 @@ export default function OnboardingPage() {
           {/* Step 2: Invite Team (Optional) */}
           {step === 2 && (
             <div>
-              <div className="bg-gradient-to-r from-monday-teal to-monday-lime px-8 py-6 text-white">
+              <div className="bg-accent/10 dark:bg-accent/20 px-8 py-6 border-b border-gray-200 dark:border-slate-700">
                 <div className="flex items-center space-x-3 mb-2">
-                  <Users className="w-8 h-8" />
-                  <h1 className="text-2xl font-bold">Invite Your Team</h1>
+                  <Users className="w-8 h-8 text-accent" />
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Invite Your Team</h1>
                 </div>
-                <p className="text-white/90">Add team members to collaborate (optional - you can do this later)</p>
+                <p className="text-gray-600 dark:text-slate-400">Add team members to collaborate (optional - you can do this later)</p>
               </div>
 
               <div className="p-8 space-y-6">
@@ -322,12 +322,12 @@ export default function OnboardingPage() {
                     onChange={(e) => setNewInviteEmail(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleAddInvite()}
                     placeholder="colleague@example.com"
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-monday-teal"
+                    className="flex-1 px-4 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-gray-900 dark:text-slate-100 placeholder:text-gray-500 dark:placeholder:text-slate-400"
                   />
                   <select
                     value={newInviteRole}
                     onChange={(e) => setNewInviteRole(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-monday-teal"
+                    className="px-4 py-2 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-gray-900 dark:text-slate-100"
                   >
                     <option value="editor">Editor</option>
                     <option value="viewer">Viewer</option>
@@ -336,7 +336,7 @@ export default function OnboardingPage() {
                   </select>
                   <button
                     onClick={handleAddInvite}
-                    className="px-4 py-2 bg-monday-teal text-white rounded-lg hover:bg-monday-teal/90 transition-colors"
+                    className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors"
                   >
                     Add
                   </button>
@@ -344,16 +344,16 @@ export default function OnboardingPage() {
 
                 {invites.length > 0 && (
                   <div className="space-y-2">
-                    <h3 className="text-sm font-medium text-gray-900">Team Members to Invite ({invites.length})</h3>
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-slate-100">Team Members to Invite ({invites.length})</h3>
                     {invites.map((invite, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-200 dark:border-slate-600">
                         <div>
-                          <div className="font-medium text-sm">{invite.email}</div>
-                          <div className="text-xs text-gray-600 capitalize">{invite.role.replace('_', ' ')}</div>
+                          <div className="font-medium text-sm text-gray-900 dark:text-slate-100">{invite.email}</div>
+                          <div className="text-xs text-gray-600 dark:text-slate-400 capitalize">{invite.role.replace('_', ' ')}</div>
                         </div>
                         <button
                           onClick={() => handleRemoveInvite(index)}
-                          className="p-1 text-red-600 hover:bg-red-50 rounded"
+                          className="p-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
                         >
                           ×
                         </button>
@@ -365,7 +365,7 @@ export default function OnboardingPage() {
                 <div className="flex space-x-3 pt-4">
                   <button
                     onClick={handleSkipInvites}
-                    className="flex-1 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                    className="flex-1 py-3 border-2 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                   >
                     Skip for Now
                   </button>
@@ -373,7 +373,7 @@ export default function OnboardingPage() {
                     <button
                       onClick={handleSendInvites}
                       disabled={loading}
-                      className="flex-1 py-3 bg-gradient-to-r from-monday-teal to-monday-lime text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                      className="flex-1 py-3 bg-accent text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
                     >
                       {loading ? 'Sending...' : `Send ${invites.length} Invite(s)`}
                     </button>
@@ -386,33 +386,33 @@ export default function OnboardingPage() {
           {/* Step 3: Complete */}
           {step === 3 && (
             <div>
-              <div className="bg-gradient-to-r from-monday-lime to-monday-teal px-8 py-6 text-white">
+              <div className="bg-accent/10 dark:bg-accent/20 px-8 py-6 border-b border-gray-200 dark:border-slate-700">
                 <div className="flex items-center space-x-3 mb-2">
-                  <Rocket className="w-8 h-8" />
-                  <h1 className="text-2xl font-bold">You're All Set!</h1>
+                  <Rocket className="w-8 h-8 text-accent" />
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">You're All Set!</h1>
                 </div>
-                <p className="text-white/90">Your organization is ready. Let's build your first FMEA!</p>
+                <p className="text-gray-600 dark:text-slate-400">Your organization is ready. Let's build your first FMEA!</p>
               </div>
 
               <div className="p-8 space-y-6 text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-monday-lime to-monday-teal rounded-full flex items-center justify-center mx-auto">
+                <div className="w-20 h-20 bg-accent rounded-full flex items-center justify-center mx-auto">
                   <CheckCircle className="w-12 h-12 text-white" />
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900 mb-2">Organization Created!</h2>
-                  <p className="text-gray-600">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-slate-100 mb-2">Organization Created!</h2>
+                  <p className="text-gray-600 dark:text-slate-400">
                     {invites.length > 0
                       ? `${invites.length} invitation(s) sent to your team members`
                       : 'You can invite team members anytime from the dashboard'}
                   </p>
                 </div>
 
-                <div className="bg-monday-paleBlue border border-monday-purple/20 rounded-lg p-4">
-                  <p className="text-sm text-gray-700">
+                <div className="bg-accent/10 dark:bg-accent/20 border border-accent/30 dark:border-accent/50 rounded-lg p-4">
+                  <p className="text-sm text-gray-900 dark:text-slate-100">
                     <strong>Next steps:</strong>
                   </p>
-                  <ul className="text-sm text-gray-700 mt-2 text-left space-y-1 max-w-md mx-auto">
+                  <ul className="text-sm text-gray-700 dark:text-slate-300 mt-2 text-left space-y-1 max-w-md mx-auto">
                     <li>• Create your first FMEA project</li>
                     <li>• Import existing Excel FMEAs</li>
                     <li>• Explore AI-assisted failure mode suggestions</li>
@@ -422,7 +422,7 @@ export default function OnboardingPage() {
 
                 <button
                   onClick={handleComplete}
-                  className="w-full py-3 bg-gradient-to-r from-monday-purple to-monday-softPurple text-white rounded-lg font-semibold hover:shadow-lg transition-all text-lg"
+                  className="w-full py-3 bg-accent text-white rounded-lg font-semibold hover:shadow-lg transition-all text-lg"
                 >
                   Go to Dashboard
                 </button>
@@ -433,7 +433,7 @@ export default function OnboardingPage() {
 
         {/* Help Text */}
         {step === 1 && (
-          <p className="text-center text-sm text-gray-600 mt-4">
+          <p className="text-center text-sm text-gray-600 dark:text-slate-400 mt-4">
             Need help? Contact support@nextgenmaint.com
           </p>
         )}

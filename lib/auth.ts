@@ -86,6 +86,7 @@ export class AuthService {
       email,
       name,
       role,
+      is_superadmin: false,
     };
   }
 
@@ -179,7 +180,7 @@ export function withAuth<T = any>(
 // Helper function to get user from request token
 export async function getUserFromToken(req: Request | { headers: Headers }): Promise<User | null> {
   try {
-    const headers = 'headers' in req ? req.headers : req.headers;
+    const headers = req.headers;
     const authHeader = headers.get('authorization');
 
     if (!authHeader?.startsWith('Bearer ')) {

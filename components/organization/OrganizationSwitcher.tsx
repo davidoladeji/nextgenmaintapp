@@ -61,8 +61,8 @@ export default function OrganizationSwitcher() {
 
   if (loading) {
     return (
-      <div className="px-4 py-3 border-b border-gray-200">
-        <div className="flex items-center space-x-2 text-sm text-gray-500">
+      <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700">
+        <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-slate-400">
           <Building className="w-4 h-4 animate-pulse" />
           <span>Loading organizations...</span>
         </div>
@@ -72,10 +72,10 @@ export default function OrganizationSwitcher() {
 
   if (organizations.length === 0) {
     return (
-      <div className="px-4 py-3 border-b border-gray-200">
+      <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700">
         <button
           onClick={() => setShowCreateModal(true)}
-          className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-gradient-to-r from-monday-purple to-monday-softPurple text-white rounded-lg hover:shadow-lg transition-all"
+          className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent hover:shadow-lg transition-all"
         >
           <Plus className="w-4 h-4" />
           <span className="font-medium">Create Organization</span>
@@ -92,14 +92,14 @@ export default function OrganizationSwitcher() {
   }
 
   return (
-    <div className="px-4 py-3 border-b border-gray-200">
+    <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-700">
       {/* Current Organization Display */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-3 py-2 hover:bg-gray-50 rounded-lg transition-colors group"
+        className="w-full flex items-center justify-between px-3 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg transition-colors group"
       >
         <div className="flex items-center space-x-3 min-w-0">
-          <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-monday-purple to-monday-softPurple rounded-lg flex items-center justify-center shadow-sm">
+          <div className="flex-shrink-0 w-8 h-8 bg-accent rounded-lg flex items-center justify-center shadow-sm">
             {currentOrganization?.logo_url ? (
               <img
                 src={currentOrganization.logo_url}
@@ -111,16 +111,16 @@ export default function OrganizationSwitcher() {
             )}
           </div>
           <div className="flex-1 min-w-0 text-left">
-            <div className="text-sm font-semibold text-gray-900 truncate">
+            <div className="text-sm font-semibold text-gray-900 dark:text-slate-100 truncate">
               {currentOrganization?.name || 'Select Organization'}
             </div>
             {currentOrganization && (
-              <div className="text-xs text-gray-500 capitalize">{currentOrganization.plan} Plan</div>
+              <div className="text-xs text-gray-500 dark:text-slate-400 capitalize">{currentOrganization.plan} Plan</div>
             )}
           </div>
         </div>
         <ChevronDown
-          className={`w-4 h-4 text-gray-400 transition-transform ${
+          className={`w-4 h-4 text-gray-400 dark:text-slate-500 transition-transform ${
             isOpen ? 'transform rotate-180' : ''
           }`}
         />
@@ -128,16 +128,16 @@ export default function OrganizationSwitcher() {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="mt-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+        <div className="mt-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg overflow-hidden">
           <div className="py-1 max-h-64 overflow-y-auto">
             {organizations.map((org) => (
               <button
                 key={org.id}
                 onClick={() => handleSwitchOrganization(org)}
-                className="w-full flex items-center justify-between px-3 py-2 hover:bg-gray-50 transition-colors text-left"
+                className="w-full flex items-center justify-between px-3 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors text-left"
               >
                 <div className="flex items-center space-x-3 min-w-0 flex-1">
-                  <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-monday-purple to-monday-softPurple rounded flex items-center justify-center">
+                  <div className="flex-shrink-0 w-6 h-6 bg-accent rounded flex items-center justify-center">
                     {org.logo_url ? (
                       <img
                         src={org.logo_url}
@@ -149,24 +149,24 @@ export default function OrganizationSwitcher() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-gray-900 truncate">{org.name}</div>
-                    <div className="text-xs text-gray-500 capitalize">{org.plan}</div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-slate-100 truncate">{org.name}</div>
+                    <div className="text-xs text-gray-500 dark:text-slate-400 capitalize">{org.plan}</div>
                   </div>
                 </div>
                 {currentOrganization?.id === org.id && (
-                  <Check className="w-4 h-4 text-monday-purple flex-shrink-0" />
+                  <Check className="w-4 h-4 text-accent flex-shrink-0" />
                 )}
               </button>
             ))}
           </div>
 
-          <div className="border-t border-gray-200">
+          <div className="border-t border-gray-200 dark:border-slate-700">
             <button
               onClick={() => {
                 setIsOpen(false);
                 setShowCreateModal(true);
               }}
-              className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-monday-purple hover:bg-monday-lightPurple transition-colors"
+              className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-accent hover:bg-accent/10 transition-colors"
             >
               <Plus className="w-4 h-4" />
               <span className="font-medium">Create Organization</span>

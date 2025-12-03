@@ -76,11 +76,20 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { name, description } = body;
+    const { name, description, status } = body;
 
     if (!name || !name.trim()) {
       return NextResponse.json(
         { success: false, error: 'Project name is required' } as APIResponse,
+        { status: 400 }
+      );
+    }
+
+    // Validate status if provided
+    const validStatuses = ['in-progress', 'completed', 'approved'];
+    if (status && !validStatuses.includes(status)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid status value' } as APIResponse,
         { status: 400 }
       );
     }
@@ -100,6 +109,7 @@ export async function PATCH(
       ...db.projects[projectIndex],
       name: name.trim(),
       description: description?.trim() || null,
+      ...(status && { status }),
       updated_at: new Date().toISOString(),
     };
 

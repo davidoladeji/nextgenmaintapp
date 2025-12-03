@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       }
 
       let suggestion;
-      
+
       switch (type) {
         case 'failure-modes':
           suggestion = await AIService.suggestFailureModes(context);
@@ -46,6 +46,15 @@ export async function POST(request: NextRequest) {
           break;
         case 'controls':
           suggestion = await AIService.suggestControls(context);
+          break;
+        case 'severity':
+          suggestion = await AIService.suggestRiskScoring(context, 'severity');
+          break;
+        case 'occurrence':
+          suggestion = await AIService.suggestRiskScoring(context, 'occurrence');
+          break;
+        case 'detection':
+          suggestion = await AIService.suggestRiskScoring(context, 'detection');
           break;
         default:
           return NextResponse.json(

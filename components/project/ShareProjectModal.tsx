@@ -127,23 +127,23 @@ export default function ShareProjectModal({ project, onClose }: ShareProjectModa
 
   const getRoleBadgeColor = (role: string) => {
     const colors = {
-      owner: 'bg-monday-purple text-white',
-      editor: 'bg-monday-teal text-white',
+      owner: 'bg-accent text-white',
+      editor: 'bg-teal-600 text-white',
       viewer: 'bg-gray-400 text-white',
     };
     return colors[role as keyof typeof colors] || 'bg-gray-300 text-gray-700';
   };
 
   // Get org members who don't already have project access
-  const availableMembers = orgMembers.filter(
-    (orgMember) => !projectMembers.some((pm) => pm.user_id === orgMember.user_id)
+  const availableMembers = (orgMembers as any[]).filter(
+    (orgMember: any) => !projectMembers.some((pm: any) => pm.user_id === orgMember.user_id)
   );
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="bg-gradient-to-r from-monday-purple to-monday-softPurple px-6 py-4 flex items-center justify-between sticky top-0 rounded-t-lg">
+        <div className="bg-accent px-6 py-4 flex items-center justify-between sticky top-0 rounded-t-lg">
           <div className="flex items-center space-x-3">
             <Share2 className="w-6 h-6 text-white" />
             <div>
@@ -162,7 +162,7 @@ export default function ShareProjectModal({ project, onClose }: ShareProjectModa
         <div className="p-6 space-y-6">
           {/* Add Member Section */}
           <div>
-            <h3 className="font-semibold text-gray-900 mb-3">Add Team Member</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-3">Add Team Member</h3>
             <form onSubmit={handleAddMember} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <select
@@ -199,7 +199,7 @@ export default function ShareProjectModal({ project, onClose }: ShareProjectModa
               </button>
 
               {availableMembers.length === 0 && (
-                <p className="text-xs text-gray-500 text-center">
+                <p className="text-xs text-gray-500 dark:text-slate-400 text-center">
                   All organization members already have access to this project
                 </p>
               )}
@@ -208,17 +208,17 @@ export default function ShareProjectModal({ project, onClose }: ShareProjectModa
 
           {/* Current Members */}
           <div>
-            <h3 className="font-semibold text-gray-900 mb-3">
+            <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-3">
               Current Members ({projectMembers.length})
             </h3>
 
             {loadingMembers ? (
               <div className="text-center py-8">
                 <div className="spinner mx-auto mb-2" />
-                <p className="text-sm text-gray-500">Loading members...</p>
+                <p className="text-sm text-gray-500 dark:text-slate-400">Loading members...</p>
               </div>
             ) : projectMembers.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-500 dark:text-slate-400">
                 <p>No shared members yet</p>
               </div>
             ) : (
@@ -226,14 +226,14 @@ export default function ShareProjectModal({ project, onClose }: ShareProjectModa
                 {projectMembers.map((member) => (
                   <div
                     key={member.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-700"
                   >
                     <div className="flex items-center space-x-3 flex-1 min-w-0">
-                      <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-monday-purple to-monday-softPurple rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                      <div className="flex-shrink-0 w-8 h-8 bg-accent rounded-full flex items-center justify-center text-white text-sm font-semibold">
                         {member.user?.name?.charAt(0).toUpperCase() || '?'}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-sm text-gray-900 truncate">
+                        <div className="font-medium text-sm text-gray-900 dark:text-slate-100 truncate">
                           {member.user?.name || 'Unknown'}
                         </div>
                         <div className="flex items-center space-x-2 mt-0.5">
@@ -241,7 +241,7 @@ export default function ShareProjectModal({ project, onClose }: ShareProjectModa
                             {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
                           </span>
                           {member.is_creator && (
-                            <span className="text-xs text-gray-500">(Creator)</span>
+                            <span className="text-xs text-gray-500 dark:text-slate-400">(Creator)</span>
                           )}
                         </div>
                       </div>

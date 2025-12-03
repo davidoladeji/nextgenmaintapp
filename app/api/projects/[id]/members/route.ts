@@ -176,7 +176,7 @@ export async function POST(
       role,
       added_by: user.id,
       added_at: new Date().toISOString(),
-      last_accessed_at: null,
+      last_accessed_at: undefined,
     };
 
     db.project_members.push(membership);

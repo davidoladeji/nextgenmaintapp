@@ -9,9 +9,26 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Save, Upload, Download } from 'lucide-react';
+import { Eye, Save, Upload, Download, Info, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useRiskSettings } from '@/lib/stores/riskSettingsStore';
+import { useProjectSettings } from '@/lib/stores/projectSettingsStore';
+import ThresholdCard from './ThresholdCard';
+import ColorPickerPopover from './ColorPickerPopover';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface SetupTabProps {
   projectId: string;
@@ -24,6 +41,10 @@ const namedColors: Record<string, string> = {
   orange: '#f97316',
   red: '#ef4444',
   blue: '#3b82f6',
+  purple: '#a855f7',
+  pink: '#ec4899',
+  teal: '#14b8a6',
+  indigo: '#6366f1',
   gray: '#9ca3af',
 };
 
@@ -65,6 +86,25 @@ export default function SetupTab({ projectId }: SetupTabProps) {
     setThresholds: setGlobalThresholds,
   } = useRiskSettings();
 
+  // Use global project settings store
+  const {
+    standards,
+    setStandards: setGlobalStandards,
+  } = useProjectSettings();
+
+  // Validate thresholds is an array, recover if corrupted
+  useEffect(() => {
+    if (!Array.isArray(thresholds) || thresholds.length === 0) {
+      console.warn('Invalid thresholds detected, resetting to defaults');
+      setGlobalThresholds([
+        { id: 1, label: 'Low', min: 1, max: 69, color: 'green' },
+        { id: 2, label: 'Medium', min: 70, max: 99, color: 'yellow' },
+        { id: 3, label: 'High', min: 100, max: 150, color: 'orange' },
+        { id: 4, label: 'Critical', min: 151, max: 1000, color: 'red' },
+      ]);
+    }
+  }, [thresholds, setGlobalThresholds]);
+
   // Structural layer
   const [preset, setPreset] = useState<PresetType>('SAE J1739');
   const [detBaseline, setDetBaseline] = useState(5); // preview multiplier
@@ -74,8 +114,7 @@ export default function SetupTab({ projectId }: SetupTabProps) {
   const [occDesc, setOccDesc] = useState('OCC=10 Very frequent; OCC=1 Rare');
   const [detDesc, setDetDesc] = useState('DET=10 Not detectable; DET=1 Easily detected');
 
-  // Standards / templates - now supports multiple selection
-  const [standards, setStandards] = useState<string[]>(['SAE J1739']);
+  // Note: standards now comes from useProjectSettings() above - no local state
   const [applyWorkspaceDefault, setApplyWorkspaceDefault] = useState(true);
 
   // Import/export JSON
@@ -90,8 +129,15 @@ export default function SetupTab({ projectId }: SetupTabProps) {
     setGlobalScaleType(type);
   };
 
-  const setThresholds = (newThresholds: Threshold[]) => {
-    setGlobalThresholds(newThresholds);
+  const setThresholds = (newThresholdsOrUpdater: Threshold[] | ((prev: Threshold[]) => Threshold[])) => {
+    if (typeof newThresholdsOrUpdater === 'function') {
+      // It's an updater function - execute it with current thresholds
+      const updatedThresholds = newThresholdsOrUpdater(thresholds);
+      setGlobalThresholds(updatedThresholds);
+    } else {
+      // It's a direct value
+      setGlobalThresholds(newThresholdsOrUpdater);
+    }
   };
 
   // Apply preset configuration
@@ -100,7 +146,7 @@ export default function SetupTab({ projectId }: SetupTabProps) {
     if (p === 'SAE J1739') {
       setMatrixSize(10);
       setScaleType('1-10');
-      setStandards(['SAE J1739']);
+      setGlobalStandards(['SAE J1739']);
       setThresholds([
         { id: 1, label: 'Low', min: 1, max: 69, color: 'green' },
         { id: 2, label: 'Medium', min: 70, max: 99, color: 'yellow' },
@@ -142,12 +188,75 @@ export default function SetupTab({ projectId }: SetupTabProps) {
     { mode: 'Mechanical wear or fatigue', sev: Math.min(7, matrixSize), occ: Math.min(6, matrixSize), det: detBaseline },
   ].map((r) => ({ ...r, rpn: r.sev * r.occ * r.det }));
 
-  const bandFor = (value: number) => thresholds.find((t) => value >= t.min && value <= t.max) || thresholds[thresholds.length - 1];
+  const bandFor = (value: number) => {
+    if (!Array.isArray(thresholds) || thresholds.length === 0) {
+      return { id: 0, label: 'Unknown', min: 0, max: 1000, color: 'gray' };
+    }
+    return thresholds.find((t) => value >= t.min && value <= t.max) || thresholds[thresholds.length - 1];
+  };
 
   const updateThreshold = (id: number, key: keyof Omit<Threshold, 'id'>, value: any) => {
     setThresholds((prev) =>
       prev.map((t) => (t.id === id ? { ...t, [key]: key === 'min' || key === 'max' ? Number(value) : value } : t))
     );
+  };
+
+  // Color picker state
+  const [colorPickerOpen, setColorPickerOpen] = useState(false);
+  const [colorPickerThresholdId, setColorPickerThresholdId] = useState<number | null>(null);
+
+  const handleColorClick = (thresholdId: number) => {
+    setColorPickerThresholdId(thresholdId);
+    setColorPickerOpen(true);
+  };
+
+  const handleColorSelect = (color: string) => {
+    if (colorPickerThresholdId !== null) {
+      updateThreshold(colorPickerThresholdId, 'color', color);
+    }
+  };
+
+  // Delete confirmation dialog
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteThresholdId, setDeleteThresholdId] = useState<number | null>(null);
+
+  const handleDeleteClick = (thresholdId: number) => {
+    setDeleteThresholdId(thresholdId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteThresholdId !== null) {
+      setThresholds((prev) => prev.filter((t) => t.id !== deleteThresholdId));
+      toast.success('Threshold deleted successfully');
+    }
+    setDeleteDialogOpen(false);
+    setDeleteThresholdId(null);
+  };
+
+  // Auto-fix validation issues
+  const handleAutoFix = () => {
+    const sorted = [...thresholds].sort((a, b) => a.min - b.min);
+    const fixed: Threshold[] = [];
+
+    sorted.forEach((t, i) => {
+      if (i === 0) {
+        // First threshold should start at 1
+        fixed.push({ ...t, min: 1 });
+      } else {
+        // Each subsequent threshold should start right after the previous one
+        const prevMax = fixed[i - 1].max;
+        fixed.push({ ...t, min: prevMax + 1 });
+      }
+    });
+
+    // Ensure last threshold covers up to rpnMax
+    if (fixed.length > 0 && fixed[fixed.length - 1].max < rpnMax) {
+      fixed[fixed.length - 1] = { ...fixed[fixed.length - 1], max: rpnMax };
+    }
+
+    setThresholds(fixed);
+    toast.success('Thresholds automatically fixed!');
   };
 
   // Validation: overlaps + coverage
@@ -191,7 +300,7 @@ export default function SetupTab({ projectId }: SetupTabProps) {
       setMatrixSize(obj.matrixSize ?? 10);
       setDetBaseline(obj.detBaseline ?? 5);
       setScaleType(obj.scaleType ?? '1-10');
-      setStandards(obj.standards ?? (obj.standard ? [obj.standard] : ['SAE J1739'])); // Support legacy single standard
+      setGlobalStandards(obj.standards ?? (obj.standard ? [obj.standard] : ['SAE J1739'])); // Support legacy single standard
       if (obj.thresholds) setThresholds(obj.thresholds);
       if (obj.descriptions) {
         setSevDesc(obj.descriptions.sevDesc ?? sevDesc);
@@ -390,70 +499,51 @@ export default function SetupTab({ projectId }: SetupTabProps) {
           {/* Criticality Thresholds */}
           <Card className="shadow-sm border-gray-200 dark:border-slate-700">
             <CardHeader>
-              <CardTitle className="text-gray-900 dark:text-slate-100">Criticality Thresholds</CardTitle>
-              <div className="text-xs text-gray-500 dark:text-slate-400">
-                Manage RPN bands used for colors, dashboards, and AI focus.
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {thresholds.map((t) => (
-                <div key={t.id} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2 items-center">
-                  <div className="sm:col-span-1 lg:col-span-3">
-                    <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1 lg:hidden">Label</label>
-                    <Input
-                      value={t.label}
-                      onChange={(e) => updateThreshold(t.id, 'label', e.target.value)}
-                      className="h-9 bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-slate-100"
-                    />
-                  </div>
-                  <div className="sm:col-span-1 lg:col-span-3 flex items-center gap-2">
-                    <div className="flex-1">
-                      <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1 lg:hidden">Color</label>
-                      <Select value={t.color} onValueChange={(v) => updateThreshold(t.id, 'color', v)}>
-                        <SelectTrigger className="h-9 bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-slate-100">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.keys(namedColors).map((c) => (
-                            <SelectItem key={c} value={c}>{c}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <input
-                      type="color"
-                      value={chipBg(String(t.color))}
-                      onChange={(e) => updateThreshold(t.id, 'color', e.target.value)}
-                      className="h-9 w-9 rounded-md border border-gray-300 dark:border-slate-600 flex-shrink-0"
-                    />
-                  </div>
-                  <div className="sm:col-span-1 lg:col-span-2">
-                    <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1 lg:hidden">Min RPN</label>
-                    <Input
-                      type="number"
-                      value={t.min}
-                      onChange={(e) => updateThreshold(t.id, 'min', e.target.value)}
-                      className="h-9 bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-slate-100"
-                    />
-                  </div>
-                  <div className="sm:col-span-1 lg:col-span-2">
-                    <label className="block text-xs font-medium text-gray-700 dark:text-slate-300 mb-1 lg:hidden">Max RPN</label>
-                    <Input
-                      type="number"
-                      value={t.max}
-                      onChange={(e) => updateThreshold(t.id, 'max', e.target.value)}
-                      className="h-9 bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-slate-100"
-                    />
-                  </div>
-                  <div className="sm:col-span-2 lg:col-span-2 flex items-center">
-                    <Chip color={String(t.color)} label={`${t.label} (${t.min}–${t.max})`} />
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <CardTitle className="text-gray-900 dark:text-slate-100 flex items-center gap-2">
+                    Criticality Thresholds
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="h-4 w-4 text-gray-400 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-sm">
+                          <p>
+                            RPN bands determine risk classification in your FMEA. These thresholds
+                            control dashboard colors, AI prioritization, and reporting categories.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </CardTitle>
+                  <div className="text-xs text-gray-500 dark:text-slate-400 mt-1">
+                    Manage RPN bands used for colors, dashboards, and AI focus.
                   </div>
                 </div>
-              ))}
-
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Validation Summary */}
               {validation.issues.length > 0 ? (
-                <div className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-3 mt-2">
-                  <div className="font-medium text-sm text-red-700 dark:text-red-400 mb-1">Validation issues</div>
+                <div className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-4">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Info className="h-4 w-4 text-red-700 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                      <div className="font-medium text-sm text-red-700 dark:text-red-400">
+                        {validation.issues.length} validation {validation.issues.length === 1 ? 'issue' : 'issues'} found
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAutoFix}
+                      className="border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30"
+                    >
+                      <Sparkles className="h-3 w-3 mr-1" />
+                      Auto-fix
+                    </Button>
+                  </div>
                   <ul className="list-disc ml-5 space-y-1">
                     {validation.issues.map((msg, i) => (
                       <li key={i} className="text-xs text-red-700 dark:text-red-400">{msg}</li>
@@ -461,12 +551,45 @@ export default function SetupTab({ projectId }: SetupTabProps) {
                   </ul>
                 </div>
               ) : (
-                <div className="text-xs text-emerald-600 dark:text-emerald-400">
-                  ✓ Thresholds look good: no overlaps and coverage is continuous to {rpnMax}.
+                <div className="rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 p-3">
+                  <div className="text-sm text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
+                    <span className="text-lg">✓</span>
+                    Thresholds look good: no overlaps and coverage is continuous to {rpnMax}.
+                  </div>
                 </div>
               )}
 
-              <div className="pt-2 flex flex-col sm:flex-row gap-2">
+              {/* Threshold Cards */}
+              <div className="space-y-3">
+                {Array.isArray(thresholds) && thresholds.map((t) => {
+                  // Find validation errors for this threshold
+                  const thresholdErrors = validation.issues.filter(
+                    (issue) => issue.toLowerCase().includes(t.label.toLowerCase())
+                  );
+                  const hasError = thresholdErrors.length > 0;
+                  const errorMessage = thresholdErrors.join(' ');
+
+                  return (
+                    <ThresholdCard
+                      key={t.id}
+                      id={t.id}
+                      label={t.label}
+                      min={t.min}
+                      max={t.max}
+                      color={String(t.color)}
+                      onUpdate={(key, value) => updateThreshold(t.id, key, value)}
+                      onDelete={() => handleDeleteClick(t.id)}
+                      onColorClick={() => handleColorClick(t.id)}
+                      hasValidationError={hasError}
+                      validationMessage={errorMessage}
+                      isDraggable={false}
+                    />
+                  );
+                })}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-2 flex flex-col sm:flex-row gap-2 border-t border-gray-200 dark:border-slate-700">
                 <Button
                   variant="outline"
                   size="sm"
@@ -488,6 +611,36 @@ export default function SetupTab({ projectId }: SetupTabProps) {
             </CardContent>
           </Card>
 
+          {/* Color Picker Dialog */}
+          {colorPickerThresholdId !== null && (
+            <ColorPickerPopover
+              currentColor={String(thresholds.find((t) => t.id === colorPickerThresholdId)?.color ?? 'gray')}
+              onColorSelect={handleColorSelect}
+              open={colorPickerOpen}
+              onOpenChange={setColorPickerOpen}
+            />
+          )}
+
+          {/* Delete Confirmation Dialog */}
+          <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Delete Threshold</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to delete this threshold? This action cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button variant="destructive" onClick={handleDeleteConfirm}>
+                  Delete
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           {/* Standards & Templates */}
           <Card className="shadow-sm border-gray-200 dark:border-slate-700">
             <CardHeader>
@@ -507,9 +660,9 @@ export default function SetupTab({ projectId }: SetupTabProps) {
                           checked={standards.includes(std)}
                           onChange={(e) => {
                             if (e.target.checked) {
-                              setStandards([...standards, std]);
+                              setGlobalStandards([...standards, std]);
                             } else {
-                              setStandards(standards.filter(s => s !== std));
+                              setGlobalStandards(standards.filter(s => s !== std));
                             }
                           }}
                           className="h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent"

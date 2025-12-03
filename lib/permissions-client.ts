@@ -1,4 +1,5 @@
 import { User } from '@/types';
+import { AuthUser } from '@/lib/auth';
 
 /**
  * Client-side permission checking utilities
@@ -11,7 +12,7 @@ import { User } from '@/types';
 /**
  * Check if user is superadmin (platform-wide access)
  */
-export function isSuperAdmin(user: User | null): boolean {
+export function isSuperAdmin(user: User | AuthUser | null): boolean {
   if (!user) return false;
   return user.is_superadmin === true;
 }

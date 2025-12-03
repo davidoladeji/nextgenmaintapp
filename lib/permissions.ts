@@ -1,5 +1,6 @@
 import { User, Organization, OrganizationMember, Project, ProjectMember } from '@/types';
 import { readDatabase } from './database-simple';
+import { AuthUser } from './auth';
 
 /**
  * Permission checking utilities for RBAC system
@@ -18,7 +19,7 @@ import { readDatabase } from './database-simple';
 /**
  * Check if user is superadmin (platform-wide access)
  */
-export function isSuperAdmin(user: User | null): boolean {
+export function isSuperAdmin(user: User | AuthUser | null): boolean {
   if (!user) return false;
   return user.is_superadmin === true;
 }

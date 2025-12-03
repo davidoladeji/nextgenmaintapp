@@ -68,9 +68,9 @@ export default function InviteMemberModal({ onClose, onSuccess }: InviteMemberMo
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full">
         {/* Header */}
-        <div className="bg-gradient-to-r from-monday-purple to-monday-softPurple px-6 py-4 flex items-center justify-between rounded-t-lg">
+        <div className="bg-accent dark:bg-accent px-6 py-4 flex items-center justify-between rounded-t-lg">
           <div className="flex items-center space-x-3">
             <UserPlus className="w-6 h-6 text-white" />
             <h2 className="text-xl font-bold text-white">Invite Team Member</h2>
@@ -87,17 +87,17 @@ export default function InviteMemberModal({ onClose, onSuccess }: InviteMemberMo
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {/* Email Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">
               Email Address *
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="colleague@example.com"
-                className="w-full pl-10 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-monday-purple focus:border-transparent"
+                className="w-full pl-10 px-4 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
                 required
               />
             </div>
@@ -105,11 +105,11 @@ export default function InviteMemberModal({ onClose, onSuccess }: InviteMemberMo
 
           {/* Role Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-gray-900 dark:text-slate-100 mb-2">
               Role *
             </label>
             <div className="space-y-2">
-              <label className="flex items-start space-x-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-monday-purple/50 transition-colors">
+              <label className="flex items-start space-x-3 p-3 border-2 border-gray-200 dark:border-slate-600 rounded-lg cursor-pointer hover:border-accent transition-colors">
                 <input
                   type="radio"
                   name="role"
@@ -119,14 +119,14 @@ export default function InviteMemberModal({ onClose, onSuccess }: InviteMemberMo
                   className="mt-0.5"
                 />
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900">Organization Admin</div>
-                  <div className="text-xs text-gray-600 mt-0.5">
+                  <div className="font-medium text-gray-900 dark:text-slate-100">Organization Admin</div>
+                  <div className="text-xs text-gray-600 dark:text-slate-400 mt-0.5">
                     Full control: manage team, create projects, organization settings
                   </div>
                 </div>
               </label>
 
-              <label className="flex items-start space-x-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-monday-purple/50 transition-colors">
+              <label className="flex items-start space-x-3 p-3 border-2 border-gray-200 dark:border-slate-600 rounded-lg cursor-pointer hover:border-accent transition-colors">
                 <input
                   type="radio"
                   name="role"
@@ -136,14 +136,14 @@ export default function InviteMemberModal({ onClose, onSuccess }: InviteMemberMo
                   className="mt-0.5"
                 />
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900">Project Manager</div>
-                  <div className="text-xs text-gray-600 mt-0.5">
+                  <div className="font-medium text-gray-900 dark:text-slate-100">Project Manager</div>
+                  <div className="text-xs text-gray-600 dark:text-slate-400 mt-0.5">
                     Create and manage projects, assign team members
                   </div>
                 </div>
               </label>
 
-              <label className="flex items-start space-x-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-monday-purple/50 transition-colors">
+              <label className="flex items-start space-x-3 p-3 border-2 border-gray-200 dark:border-slate-600 rounded-lg cursor-pointer hover:border-accent transition-colors">
                 <input
                   type="radio"
                   name="role"
@@ -153,14 +153,14 @@ export default function InviteMemberModal({ onClose, onSuccess }: InviteMemberMo
                   className="mt-0.5"
                 />
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900">Editor</div>
-                  <div className="text-xs text-gray-600 mt-0.5">
+                  <div className="font-medium text-gray-900 dark:text-slate-100">Editor</div>
+                  <div className="text-xs text-gray-600 dark:text-slate-400 mt-0.5">
                     Edit FMEA data in assigned projects
                   </div>
                 </div>
               </label>
 
-              <label className="flex items-start space-x-3 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-monday-purple/50 transition-colors">
+              <label className="flex items-start space-x-3 p-3 border-2 border-gray-200 dark:border-slate-600 rounded-lg cursor-pointer hover:border-accent transition-colors">
                 <input
                   type="radio"
                   name="role"
@@ -170,8 +170,8 @@ export default function InviteMemberModal({ onClose, onSuccess }: InviteMemberMo
                   className="mt-0.5"
                 />
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900">Viewer</div>
-                  <div className="text-xs text-gray-600 mt-0.5">
+                  <div className="font-medium text-gray-900 dark:text-slate-100">Viewer</div>
+                  <div className="text-xs text-gray-600 dark:text-slate-400 mt-0.5">
                     Read-only access to projects
                   </div>
                 </div>
@@ -180,18 +180,18 @@ export default function InviteMemberModal({ onClose, onSuccess }: InviteMemberMo
           </div>
 
           {/* Info */}
-          <div className="bg-monday-paleBlue border border-monday-purple/20 rounded-lg p-3">
-            <p className="text-sm text-gray-700">
+          <div className="bg-accent/10 border border-accent rounded-lg p-3">
+            <p className="text-sm text-gray-700 dark:text-slate-300">
               <span className="font-medium">📧 Email invitation</span> will be sent with a link to join <strong>{currentOrganization?.name}</strong>.
             </p>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
+          <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-slate-700">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
               disabled={loading}
             >
               Cancel
@@ -202,7 +202,7 @@ export default function InviteMemberModal({ onClose, onSuccess }: InviteMemberMo
               className={`px-6 py-2 rounded-lg font-medium transition-all ${
                 loading || !email.trim()
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-monday-purple to-monday-softPurple text-white hover:shadow-lg hover:scale-105 active:scale-95'
+                  : 'bg-accent text-white hover:bg-accent hover:shadow-lg hover:scale-105 active:scale-95'
               }`}
             >
               {loading ? 'Sending...' : 'Send Invitation'}

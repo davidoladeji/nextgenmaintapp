@@ -1,3 +1,4 @@
+import { FailureMode, Cause, Effect, Control } from "@/types";
 import { NextRequest, NextResponse } from 'next/server';
 import { readDatabase, writeDatabase } from '@/lib/database-simple';
 
@@ -21,7 +22,7 @@ export async function PATCH(
     const db = readDatabase();
 
     // Verify failure mode exists
-    const failureMode = db.failureModes.find(fm => fm.id === failureModeId);
+    const failureMode = db.failureModes.find((fm: FailureMode) => fm.id === failureModeId);
     if (!failureMode) {
       return NextResponse.json(
         { success: false, error: 'Failure mode not found' },
@@ -30,7 +31,7 @@ export async function PATCH(
     }
 
     // Find and update control
-    const controlIndex = db.controls.findIndex(c => c.id === controlId);
+    const controlIndex = db.controls.findIndex((ctrl: Control) => ctrl.id === controlId);
     if (controlIndex === -1) {
       return NextResponse.json(
         { success: false, error: 'Control not found' },
@@ -76,7 +77,7 @@ export async function DELETE(
     const db = readDatabase();
 
     // Verify failure mode exists
-    const failureMode = db.failureModes.find(fm => fm.id === failureModeId);
+    const failureMode = db.failureModes.find((fm: FailureMode) => fm.id === failureModeId);
     if (!failureMode) {
       return NextResponse.json(
         { success: false, error: 'Failure mode not found' },
@@ -85,7 +86,7 @@ export async function DELETE(
     }
 
     // Find control
-    const controlIndex = db.controls.findIndex(c => c.id === controlId);
+    const controlIndex = db.controls.findIndex((ctrl: Control) => ctrl.id === controlId);
     if (controlIndex === -1) {
       return NextResponse.json(
         { success: false, error: 'Control not found' },

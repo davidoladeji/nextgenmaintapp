@@ -90,7 +90,7 @@ export default function FMEATable({
       field: 'processStep',
       width: 200,
       filter: 'agTextColumnFilter',
-      cellStyle: { fontWeight: 500 },
+      cellStyle: { fontWeight: 500 } as any,
     },
     {
       headerName: 'Failure Mode',
@@ -104,21 +104,21 @@ export default function FMEATable({
       field: 'causesCount',
       width: 80,
       type: 'numericColumn',
-      cellStyle: { textAlign: 'center' },
+      cellStyle: { textAlign: 'center' } as any,
     },
     {
       headerName: 'Effects',
       field: 'effectsCount',
       width: 80,
       type: 'numericColumn',
-      cellStyle: { textAlign: 'center' },
+      cellStyle: { textAlign: 'center' } as any,
     },
     {
       headerName: 'SEV',
       field: 'maxSeverity',
       width: 70,
       type: 'numericColumn',
-      cellStyle: { textAlign: 'center', fontWeight: 600 },
+      cellStyle: { textAlign: 'center', fontWeight: 600 } as any,
       tooltipValueGetter: () => 'Severity (1-10): Impact of failure',
     },
     {
@@ -126,7 +126,7 @@ export default function FMEATable({
       field: 'maxOccurrence',
       width: 70,
       type: 'numericColumn',
-      cellStyle: { textAlign: 'center', fontWeight: 600 },
+      cellStyle: { textAlign: 'center', fontWeight: 600 } as any,
       tooltipValueGetter: () => 'Occurrence (1-10): Likelihood of failure',
     },
     {
@@ -134,7 +134,7 @@ export default function FMEATable({
       field: 'maxDetection',
       width: 70,
       type: 'numericColumn',
-      cellStyle: { textAlign: 'center', fontWeight: 600 },
+      cellStyle: { textAlign: 'center', fontWeight: 600 } as any,
       tooltipValueGetter: () => 'Detection (1-10): Ability to detect failure',
     },
     {
@@ -172,7 +172,6 @@ export default function FMEATable({
     sortable: true,
     filter: true,
     resizable: true,
-    tooltipShowDelay: 500,
   };
 
   const onRowClicked = (event: any) => {
@@ -250,12 +249,12 @@ export default function FMEATable({
             headerHeight={48}
             getRowStyle={(params) => {
               if (params.data.maxRPN >= 200) {
-                return { background: '#fef2f2' }; // Light red background for high risk
+                return { background: '#fef2f2' } as any; // Light red background for high risk
               }
               if (params.data.maxRPN >= 100) {
-                return { background: '#fffbeb' }; // Light yellow background for medium risk
+                return { background: '#fffbeb' } as any; // Light yellow background for medium risk
               }
-              return {};
+              return undefined;
             }}
           />
         )}

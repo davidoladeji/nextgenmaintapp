@@ -43,6 +43,10 @@ const namedColors: Record<string, string> = {
   orange: '#f97316',
   red: '#ef4444',
   blue: '#3b82f6',
+  purple: '#a855f7',
+  pink: '#ec4899',
+  teal: '#14b8a6',
+  indigo: '#6366f1',
   gray: '#9ca3af',
 };
 
@@ -52,12 +56,13 @@ export const useRiskSettings = create<RiskSettingsState>()(
       // Initial state
       matrixSize: 10,
       scaleType: '1-10',
-      thresholds: defaultThresholds,
+      thresholds: Array.isArray(defaultThresholds) ? defaultThresholds : [],
 
       // Actions
       setMatrixSize: (size) => set({ matrixSize: size }),
       setScaleType: (type) => set({ scaleType: type }),
-      setThresholds: (thresholds) => set({ thresholds }),
+      setThresholds: (thresholds) =>
+        set({ thresholds: Array.isArray(thresholds) ? thresholds : [] }),
       updateThreshold: (id, updates) =>
         set((state) => ({
           thresholds: state.thresholds.map((t) =>
@@ -89,6 +94,13 @@ export const useRiskSettings = create<RiskSettingsState>()(
     }),
     {
       name: 'risk-settings-storage',
+      partialize: (state) => ({
+        matrixSize: state.matrixSize,
+        scaleType: state.scaleType,
+        thresholds: Array.isArray(state.thresholds)
+          ? state.thresholds
+          : defaultThresholds,
+      }),
     }
   )
 );

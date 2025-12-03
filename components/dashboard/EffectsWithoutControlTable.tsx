@@ -76,43 +76,43 @@ export default function EffectsWithoutControlTable({ failureModes, onRowClick }:
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+    <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-2">
-          <AlertTriangle className="w-5 h-5 text-red-600" />
+          <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Top 5 Effects Without Control</h3>
-            <p className="text-sm text-gray-600">Failure modes requiring immediate control implementation</p>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-100">Top 5 Effects Without Control</h3>
+            <p className="text-sm text-gray-600 dark:text-slate-400">Failure modes requiring immediate control implementation</p>
           </div>
         </div>
       </div>
 
       {failureModesWithoutControl.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+        <div className="flex flex-col items-center justify-center py-12 text-gray-500 dark:text-slate-500">
           <div className="text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <p className="font-medium text-gray-900 mb-1">Great! All failure modes have controls</p>
+            <p className="font-medium text-gray-900 dark:text-slate-100 mb-1">Great! All failure modes have controls</p>
             <p className="text-sm">Continue monitoring for new failure modes requiring controls</p>
           </div>
         </div>
       ) : (
         <>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[900px]">
               <thead>
-                <tr className="border-b-2 border-gray-300">
-                  <th className="px-4 py-3 text-left font-semibold text-gray-700">Component</th>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-700">Failure Mode</th>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-700">Effect</th>
-                  <th className="px-4 py-3 text-center font-semibold text-gray-700">SEV</th>
-                  <th className="px-4 py-3 text-center font-semibold text-gray-700">OCC</th>
-                  <th className="px-4 py-3 text-center font-semibold text-gray-700">DET</th>
-                  <th className="px-4 py-3 text-center font-semibold text-gray-700">RPN</th>
-                  <th className="px-4 py-3 text-center font-semibold text-gray-700">Status</th>
+                <tr className="border-b-2 border-gray-300 dark:border-slate-600">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-300 min-w-[120px]">Component</th>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-300 min-w-[180px]">Failure Mode</th>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-slate-300 min-w-[250px]">Effect</th>
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 w-[60px]">SEV</th>
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 w-[60px]">OCC</th>
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 w-[60px]">DET</th>
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 w-[80px]">RPN</th>
+                  <th className="px-4 py-3 text-center font-semibold text-gray-700 dark:text-slate-300 w-[120px]">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -120,24 +120,24 @@ export default function EffectsWithoutControlTable({ failureModes, onRowClick }:
                   <tr
                     key={index}
                     onClick={() => onRowClick?.(item.failureMode)}
-                    className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors"
+                    className="border-b border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer transition-colors"
                   >
-                    <td className="px-4 py-3 font-medium text-gray-900">{item.component}</td>
-                    <td className="px-4 py-3 text-gray-700">{item.failureMode.failure_mode}</td>
-                    <td className="px-4 py-3 text-gray-700">
+                    <td className="px-4 py-3 font-medium text-gray-900 dark:text-slate-100 whitespace-normal break-words">{item.component}</td>
+                    <td className="px-4 py-3 text-gray-700 dark:text-slate-300 whitespace-normal break-words">{item.failureMode.failure_mode}</td>
+                    <td className="px-4 py-3 text-gray-700 dark:text-slate-300 whitespace-normal break-words">
                       {item.failureMode.effects && item.failureMode.effects.length > 0
                         ? item.failureMode.effects[0].description
                         : '-'}
                     </td>
-                    <td className="px-4 py-3 text-center font-semibold text-gray-900">{item.sev}</td>
-                    <td className="px-4 py-3 text-center font-semibold text-gray-900">{item.occ}</td>
-                    <td className="px-4 py-3 text-center font-semibold text-gray-900">{item.det}</td>
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-4 py-3 text-center font-semibold text-gray-900 dark:text-slate-100 whitespace-nowrap">{item.sev}</td>
+                    <td className="px-4 py-3 text-center font-semibold text-gray-900 dark:text-slate-100 whitespace-nowrap">{item.occ}</td>
+                    <td className="px-4 py-3 text-center font-semibold text-gray-900 dark:text-slate-100 whitespace-nowrap">{item.det}</td>
+                    <td className="px-4 py-3 text-center whitespace-nowrap">
                       <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-bold border ${getRPNColorClass(item.rpn)}`}>
                         {item.rpn}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-4 py-3 text-center whitespace-nowrap">
                       {getStatusBadge(item.failureMode)}
                     </td>
                   </tr>
@@ -146,17 +146,17 @@ export default function EffectsWithoutControlTable({ failureModes, onRowClick }:
             </table>
           </div>
 
-          <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-3">
+          <div className="mt-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
             <div className="flex items-start space-x-2">
-              <div className="text-red-600 font-semibold text-xs mt-0.5">⚠</div>
-              <div className="text-xs text-red-800">
+              <div className="text-red-600 dark:text-red-400 font-semibold text-xs mt-0.5">⚠</div>
+              <div className="text-xs text-red-800 dark:text-red-300">
                 <span className="font-semibold">Action Required:</span> These failure modes lack adequate controls, leaving them vulnerable.
                 Implement prevention or detection controls to reduce OCC/DET and lower RPN.
               </div>
             </div>
           </div>
 
-          <div className="mt-2 text-xs text-gray-500 text-center">
+          <div className="mt-2 text-xs text-gray-500 dark:text-slate-500 text-center">
             Click on rows to view details and add controls • Showing top 5 control gaps
           </div>
         </>
