@@ -137,7 +137,7 @@ Update the pnpm version:
 - name: Setup pnpm
   uses: pnpm/action-setup@v2
   with:
-    version: 8  # Change this
+    version: 10  # Change this
 \`\`\`
 
 ### Adding Environment Variables
