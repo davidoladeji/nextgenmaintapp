@@ -84,12 +84,16 @@ export default function SetupTab({ projectId }: SetupTabProps) {
     setMatrixSize: setGlobalMatrixSize,
     setScaleType: setGlobalScaleType,
     setThresholds: setGlobalThresholds,
+    loadFromProject,
+    saveToProject,
   } = useRiskSettings();
 
   // Use global project settings store
   const {
     standards,
     setStandards: setGlobalStandards,
+    loadFromProject: loadFromProjectSettings,
+    saveToProject: saveToProjectSettings,
   } = useProjectSettings();
 
   // Validate thresholds is an array, recover if corrupted
