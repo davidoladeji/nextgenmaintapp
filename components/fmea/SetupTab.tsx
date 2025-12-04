@@ -105,6 +105,14 @@ export default function SetupTab({ projectId }: SetupTabProps) {
     }
   }, [thresholds, setGlobalThresholds]);
 
+  // Load settings from API when component mounts
+  useEffect(() => {
+    if (projectId) {
+      loadFromProject(projectId);
+      loadFromProjectSettings(projectId);
+    }
+  }, [projectId, loadFromProject, loadFromProjectSettings]);
+
   // Structural layer
   const [preset, setPreset] = useState<PresetType>('SAE J1739');
   const [detBaseline, setDetBaseline] = useState(5); // preview multiplier
@@ -326,14 +334,16 @@ export default function SetupTab({ projectId }: SetupTabProps) {
     });
   }, [sample, thresholds]);
 
-  const handleSaveSettings = () => {
-    const settings = {
-      preset, matrixSize, detBaseline, scaleType, standards, thresholds,
-      descriptions: { sevDesc, occDesc, detDesc },
-      applyWorkspaceDefault
-    };
-    localStorage.setItem(`fmea-settings-${projectId}`, JSON.stringify(settings));
-    toast.success('Settings saved successfully!');
+  const handleSaveSettings = async () => {
+    try {
+      // Save to API instead of localStorage
+      await saveToProject(projectId);
+      await saveToProjectSettings(projectId);
+      toast.success('Settings saved successfully!');
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      toast.error('Failed to save settings');
+    }
   };
 
   return (

@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 export interface CriticalityThreshold {
   id: number;
@@ -17,11 +16,19 @@ interface RiskSettingsState {
   // Criticality thresholds (RPN bands)
   thresholds: CriticalityThreshold[];
 
+  // Loading state
+  isLoading: boolean;
+  currentProjectId: string | null;
+
   // Actions
   setMatrixSize: (size: number) => void;
   setScaleType: (type: '1-10' | '1-5') => void;
   setThresholds: (thresholds: CriticalityThreshold[]) => void;
   updateThreshold: (id: number, updates: Partial<CriticalityThreshold>) => void;
+
+  // API actions
+  loadFromProject: (projectId: string) => Promise<void>;
+  saveToProject: (projectId: string) => Promise<void>;
 
   // Helper functions
   getRPNColor: (rpn: number) => string;
@@ -50,57 +57,110 @@ const namedColors: Record<string, string> = {
   gray: '#9ca3af',
 };
 
-export const useRiskSettings = create<RiskSettingsState>()(
-  persist(
-    (set, get) => ({
-      // Initial state
-      matrixSize: 10,
-      scaleType: '1-10',
-      thresholds: Array.isArray(defaultThresholds) ? defaultThresholds : [],
+export const useRiskSettings = create<RiskSettingsState>()((set, get) => ({
+  // Initial state
+  matrixSize: 12,
+  scaleType: '1-10',
+  thresholds: Array.isArray(defaultThresholds) ? defaultThresholds : [],
+  isLoading: false,
+  currentProjectId: null,
 
-      // Actions
-      setMatrixSize: (size) => set({ matrixSize: size }),
-      setScaleType: (type) => set({ scaleType: type }),
-      setThresholds: (thresholds) =>
-        set({ thresholds: Array.isArray(thresholds) ? thresholds : [] }),
-      updateThreshold: (id, updates) =>
-        set((state) => ({
-          thresholds: state.thresholds.map((t) =>
-            t.id === id ? { ...t, ...updates } : t
-          ),
-        })),
+  // Actions
+  setMatrixSize: (size) => set({ matrixSize: size }),
+  setScaleType: (type) => set({ scaleType: type }),
+  setThresholds: (thresholds) =>
+    set({ thresholds: Array.isArray(thresholds) ? thresholds : [] }),
+  updateThreshold: (id, updates) =>
+    set((state) => ({
+      thresholds: state.thresholds.map((t) =>
+        t.id === id ? { ...t, ...updates } : t
+      ),
+    })),
 
-      // Helper functions
-      getRPNColor: (rpn: number) => {
-        const { thresholds } = get();
-        const threshold = thresholds.find(
-          (t) => rpn >= t.min && rpn <= t.max
-        );
-        if (!threshold) return namedColors.gray;
+  // API actions
+  loadFromProject: async (projectId: string) => {
+    set({ isLoading: true });
+    try {
+      const token = localStorage.getItem('auth-token');
+      const response = await fetch(`/api/projects/${projectId}/settings`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        // Return hex color if it starts with #, otherwise map from named colors
-        return threshold.color.startsWith('#')
-          ? threshold.color
-          : namedColors[threshold.color] || namedColors.gray;
-      },
+      if (!response.ok) {
+        throw new Error('Failed to load project settings');
+      }
 
-      getRPNLabel: (rpn: number) => {
-        const { thresholds } = get();
-        const threshold = thresholds.find(
-          (t) => rpn >= t.min && rpn <= t.max
-        );
-        return threshold?.label || 'Unknown';
-      },
-    }),
-    {
-      name: 'risk-settings-storage',
-      partialize: (state) => ({
-        matrixSize: state.matrixSize,
-        scaleType: state.scaleType,
-        thresholds: Array.isArray(state.thresholds)
-          ? state.thresholds
-          : defaultThresholds,
-      }),
+      const { data } = await response.json();
+
+      if (data.riskMatrix && data.thresholds) {
+        set({
+          matrixSize: data.riskMatrix.matrixSize,
+          scaleType: data.riskMatrix.scaleType,
+          thresholds: data.thresholds,
+          currentProjectId: projectId,
+          isLoading: false,
+        });
+      }
+    } catch (error) {
+      console.error('Error loading risk settings:', error);
+      set({ isLoading: false });
     }
-  )
-);
+  },
+
+  saveToProject: async (projectId: string) => {
+    try {
+      const { matrixSize, scaleType, thresholds } = get();
+      const token = localStorage.getItem('auth-token');
+
+      const response = await fetch(`/api/projects/${projectId}/settings`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          riskMatrix: {
+            matrixSize,
+            scaleType,
+            detBaseline: 5,
+            preset: matrixSize === 12 ? '12x12' : matrixSize === 10 ? 'SAE J1739' : 'Custom',
+          },
+          thresholds,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save project settings');
+      }
+
+      set({ currentProjectId: projectId });
+    } catch (error) {
+      console.error('Error saving risk settings:', error);
+      throw error;
+    }
+  },
+
+  // Helper functions
+  getRPNColor: (rpn: number) => {
+    const { thresholds } = get();
+    const threshold = thresholds.find(
+      (t) => rpn >= t.min && rpn <= t.max
+    );
+    if (!threshold) return namedColors.gray;
+
+    // Return hex color if it starts with #, otherwise map from named colors
+    return threshold.color.startsWith('#')
+      ? threshold.color
+      : namedColors[threshold.color] || namedColors.gray;
+  },
+
+  getRPNLabel: (rpn: number) => {
+    const { thresholds } = get();
+    const threshold = thresholds.find(
+      (t) => rpn >= t.min && rpn <= t.max
+    );
+    return threshold?.label || 'Unknown';
+  },
+}));

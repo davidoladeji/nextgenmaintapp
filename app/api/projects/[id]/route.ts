@@ -76,7 +76,7 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { name, description, status } = body;
+    const { name, description, status, settings } = body;
 
     if (!name || !name.trim()) {
       return NextResponse.json(
@@ -110,6 +110,7 @@ export async function PATCH(
       name: name.trim(),
       description: description?.trim() || null,
       ...(status && { status }),
+      ...(settings && { settings }),
       updated_at: new Date().toISOString(),
     };
 

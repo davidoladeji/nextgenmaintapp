@@ -90,6 +90,37 @@ export interface RiskCalculation {
 }
 
 // Project & Asset Types
+export interface CriticalityThreshold {
+  id: number;
+  label: string;
+  min: number;
+  max: number;
+  color: string;
+}
+
+export interface ProjectSettings {
+  // Risk Matrix Configuration
+  riskMatrix: {
+    matrixSize: number;
+    scaleType: '1-10' | '1-5';
+    detBaseline: number;
+    preset: string; // 'SAE J1739', '5x5', '6x6', '10x10', '12x12', 'Custom'
+  };
+
+  // Criticality Thresholds
+  thresholds: CriticalityThreshold[];
+
+  // Standards
+  standards: string[];
+
+  // Scale Descriptions
+  descriptions: {
+    severity: { [key: number]: string };
+    occurrence: { [key: number]: string };
+    detection: { [key: number]: string };
+  };
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -100,6 +131,7 @@ export interface Project {
   organization_id: string; // Organization this project belongs to
   tool_id?: string; // Tool this project belongs to (defaults to 'fmea')
   status: 'in-progress' | 'completed' | 'approved';
+  settings?: ProjectSettings; // Project-specific FMEA settings
   createdAt: Date;
   updatedAt: Date;
   created_at: string;
@@ -195,12 +227,19 @@ export interface ProjectGuestLink {
 }
 
 // User & Authentication
+export interface UserPreferences {
+  current_organization_id?: string;
+  onboarding_completed: boolean;
+  theme?: 'light' | 'dark' | 'system';
+}
+
 export interface User {
   id: string;
   email: string;
   name: string;
   is_superadmin: boolean; // Platform-wide admin
   avatar_url?: string;
+  preferences?: UserPreferences;
   createdAt: Date;
   updatedAt: Date;
   // Legacy field for backward compatibility
